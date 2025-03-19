@@ -1,0 +1,134 @@
+.next-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  /* padding: 20px; */
+  color: white;
+  overflow: hidden; /* Prevent outer container scrollbar */
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.back-btn {
+  padding: 8px 16px;
+  background-color: #4a4a4a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.back-btn:hover {
+  background-color: #3a3a3a;
+}
+
+.json-content {
+  flex: 1;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 20px;
+  overflow: hidden; /* Remove scrollbar from content container */
+}
+
+.json-viewer {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  white-space: pre-wrap;
+  color: black;
+  overflow: hidden; /* Remove scrollbar */
+}
+
+/* New list view styles */
+.json-list-container {
+  border-top: 2px solid #111;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: auto; /* Keep this one as auto to allow scrolling ONLY within the table */
+  max-height: 70vh; /* Adjust to ensure it fits within the parent container */
+}
+
+.json-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.json-list-table th {
+  background-color: #f0f0f0;
+  padding: 10px;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+}
+
+.json-list-item {
+  border-bottom: 1px solid #eee;
+}
+
+.json-list-item:hover {
+  background-color: #f9f9f9;
+}
+
+.json-list-key {
+  padding: 8px 10px;
+  font-weight: 500;
+  color: #7a3e9d;
+  width: 40%;
+  vertical-align: top;
+}
+
+.json-list-value {
+  padding: 8px 10px;
+  width: 60%;
+  word-break: break-word;
+}
+
+.json-display {
+  padding: 10px;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.json-item {
+  margin: 3px 0;
+}
+
+.json-key {
+  color: #7a3e9d;
+  font-weight: bold;
+}
+
+.json-string {
+  color: #008000;
+}
+
+.json-number {
+  color: #0000ff;
+}
+
+.json-boolean {
+  color: #ff8c00;
+}
+
+.json-null {
+  color: #999;
+  font-style: italic;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 18px;
+  color: #666;
+}
