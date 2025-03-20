@@ -31,16 +31,36 @@ function App() {
     }
 
     // Example: Load a schema from a file or API
-    // For demonstration, we'll use a simple schema
+    // For demonstration, we'll use a more flexible schema that accepts both objects and arrays
     const demoSchema = {
-      type: "object",
-      properties: {
-        example: { type: "string" },
-        name: { type: "string" },
-        age: { type: "number" }
-      },
-      // Remove any "required" constraints that might filter data
-      additionalProperties: true // Allow additional properties beyond the schema
+      // Use oneOf to allow multiple types at the root
+      oneOf: [
+        // Option 1: An object
+        {
+          type: "object",
+          properties: {
+            example: { type: "string" },
+            name: { type: "string" },
+            age: { type: "number" }
+          },
+          additionalProperties: true // Allow additional properties
+        },
+        // Option 2: An array
+        {
+          type: "array",
+          items: {
+            // Each array item can be any valid JSON value
+            oneOf: [
+              { type: "object", additionalProperties: true },
+              { type: "array", items: {} },
+              { type: "string" },
+              { type: "number" },
+              { type: "boolean" },
+              { type: "null" }
+            ]
+          }
+        }
+      ]
     };
     setSchema(demoSchema);
   }, []);
@@ -76,17 +96,36 @@ function App() {
         const valid = validate(parsedJson);
         
         if (!valid) {
-          // Enhanced schema validation errors
+          // Enhanced schema validation errors with better messages for arrays
           const enhancedErrors = validate.errors.map(error => {
             // For schema errors, extract the path to help locate the issue
             const path = error.instancePath || '';
+            const isRootArray = parsedJson && Array.isArray(parsedJson) && path === '';
+            
+            // Customize message for root array if needed
+            let customMessage = error.message;
+            if (isRootArray && error.message.includes('must be object')) {
+              customMessage = 'JSON structure is valid (array format accepted)';
+            }
+            
             return {
-              message: `${error.message} at '${path || 'root'}'`,
+              message: `${customMessage} at '${path || 'root'}'`,
               path: path,
               keyword: error.keyword,
               params: error.params
             };
           });
+          
+          // Special case: if the only error is about type at root level and we have an array,
+          // we'll consider it valid
+          if (Array.isArray(parsedJson) && 
+              enhancedErrors.length === 1 && 
+              enhancedErrors[0].keyword === 'type' && 
+              enhancedErrors[0].path === '') {
+            setValidationErrors([]);
+            setIsValid(true);
+            return;
+          }
           
           setValidationErrors(enhancedErrors);
           setIsValid(false);
@@ -129,31 +168,47 @@ function App() {
     } catch (e) {
       setIsValid(false);
       
-      // Enhanced error handling with line number detection
+      // Enhanced error handling with more precise line number detection
       const errorMessage = e.message;
       let lineNumber = null;
+      let columnNumber = null;
       
-      // Extract line number information from the error message if available
+      // First, try to extract position from the JSON syntax error
       const positionMatch = errorMessage.match(/at position (\d+)/);
       if (positionMatch && positionMatch[1]) {
         const position = parseInt(positionMatch[1], 10);
-        // Calculate the line number by counting newlines before the position
-        const value = editorRef.current.getValue(); // Define value variable here
-        const contentBeforeError = value.substring(0, position);
-        lineNumber = (contentBeforeError.match(/\n/g) || []).length + 1;
+        const value = editorRef.current.getValue();
+        
+        // Find line and column number by analyzing the text
+        let line = 1;
+        let column = 1;
+        for (let i = 0; i < position; i++) {
+          if (value[i] === '\n') {
+            line++;
+            column = 1;
+          } else {
+            column++;
+          }
+        }
+        
+        lineNumber = line;
+        columnNumber = column;
       }
       
-      // Create a more detailed error message with line info if available
+      // Create a detailed error message with precise location
       const detailedError = {
         message: errorMessage,
         lineNumber: lineNumber,
+        columnNumber: columnNumber,
         position: positionMatch ? positionMatch[1] : null,
-        rawError: e.toString()
+        rawError: e.toString(),
+        // Store the actual content of the problematic line for display
+        lineContent: lineNumber ? getLineContent(editorRef.current.getValue(), lineNumber) : null
       };
       
       setValidationErrors([detailedError]);
       
-      // Additionally, if we have Monaco editor reference, we can highlight the error
+      // Highlight the error in the editor
       if (lineNumber && editorRef.current && monacoRef.current) {
         const monaco = monacoRef.current;
         const editor = editorRef.current;
@@ -161,9 +216,37 @@ function App() {
         // Focus editor and position cursor at the error location
         editor.focus();
         editor.revealLineInCenter(lineNumber);
-        editor.setPosition({ lineNumber, column: 1 });
+        
+        // Set cursor to the exact position of the error
+        if (columnNumber) {
+          editor.setPosition({ lineNumber, column: columnNumber });
+          
+          // Add a decoration to highlight the error
+          const decorations = editor.deltaDecorations([], [
+            {
+              range: new monaco.Range(lineNumber, columnNumber, lineNumber, columnNumber + 1),
+              options: {
+                inlineClassName: 'errorHighlight',
+                hoverMessage: { value: errorMessage }
+              }
+            }
+          ]);
+          
+          // Remove decoration after 5 seconds
+          setTimeout(() => {
+            editor.deltaDecorations(decorations, []);
+          }, 5000);
+        } else {
+          editor.setPosition({ lineNumber, column: 1 });
+        }
       }
     }
+  };
+
+  // Helper function to get the content of a specific line
+  const getLineContent = (text, lineNumber) => {
+    const lines = text.split('\n');
+    return lines[lineNumber - 1] || '';
   };
 
   // File upload handler with enhanced validation
@@ -272,9 +355,20 @@ function App() {
             {validationErrors.map((error, index) => (
               <li key={index} className="error-item">
                 {error.lineNumber ? (
-                  <span className="error-location">Line {error.lineNumber}: </span>
+                  <div className="error-location-container">
+                    <span className="error-location">Line {error.lineNumber}</span>
+                    {error.columnNumber && <span className="error-column">, Column {error.columnNumber}</span>}:
+                    {error.lineContent && (
+                      <pre className="error-line-content">
+                        {error.lineContent}
+                        {error.columnNumber && (
+                          <div className="error-pointer" style={{ paddingLeft: error.columnNumber - 1 }}>^</div>
+                        )}
+                      </pre>
+                    )}
+                  </div>
                 ) : error.path ? (
-                  <span className="error-location">Path '{error.path}': </span>
+                  <span className="error-location">Path '{error.path}'</span>
                 ) : null}
                 <span className="error-message">{error.message}</span>
                 {error.rawError && (
