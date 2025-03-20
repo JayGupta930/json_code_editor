@@ -36,25 +36,12 @@ header {
   background-color: #3a3a3a;
 }
 
-.display-toggle-btn {
-  padding: 8px 16px;
-  background-color: #0e639c;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.display-toggle-btn:hover {
-  background-color: #1177bb;
-}
-
 .json-content {
   flex: 1;
-  overflow: hidden;
+  overflow: auto;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .json-viewer {
@@ -79,11 +66,16 @@ header {
 /* Enhanced Cards View Styling */
 .cards-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, 300px);
+  gap: 150px;
   padding: 16px 8px;
   overflow-y: auto;
   max-height: calc(100vh - 200px);
+  flex: 1;
+  overflow: auto;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .json-card {
@@ -95,21 +87,13 @@ header {
   display: flex;
   flex-direction: column;
   position: relative;
-  border: none;
-}
-
-.json-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, var(--card-color-primary), var(--card-color-secondary));
+  border: 2px solid black;
+  width: 350px;
+  height: 400px;
 }
 
 .json-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
 }
 
@@ -202,7 +186,7 @@ header {
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
+} 
 
 .card-property, .card-list-item {
   display: flex;
@@ -213,7 +197,6 @@ header {
 
 .card-property:hover, .card-list-item:hover {
   background-color: rgba(0, 0, 0, 0.02);
-  border-radius: 4px;
 }
 
 .card-property-key, .card-list-index {
@@ -286,42 +269,24 @@ header {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(to right,
-    transparent,
-    rgba(122, 62, 157, 0.2),
-    transparent);
-}
-
-.view-details-btn {
-  background-color: white;
-  border: 2px solid var(--card-color-primary);
-  color: var(--card-color-primary);
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.2s;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  letter-spacing: 0.3px;
-}
-
-.view-details-btn:hover {
-  background-color: var(--card-color-primary);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.view-details-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to right, transparent, rgba(122, 62, 157, 0.2), transparent);
 }
 
 /* Styled scrollbars for card content */
 .card-content::-webkit-scrollbar {
   width: 6px;
   height: 6px;
+}
+
+.view-details-btn {
+  padding: 8px 16px;
+  border: 2px solid blueviolet;
+  background-color: blueviolet;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
 }
 
 .card-content::-webkit-scrollbar-track {
@@ -397,76 +362,6 @@ header {
   border-radius: 4px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(14, 99, 156, 0.2);
-}
-
-/* List View Styling (existing) */
-.json-list-container {
-  border-top: 2px solid #111;
-  border-radius: 4px;
-  background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  overflow: auto; /* Keep this one as auto to allow scrolling ONLY within the table */
-  max-height: 70vh; /* Adjust to ensure it fits within the parent container */
-}
-
-.json-list-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-
-.json-list-table th {
-  background-color: #f0f0f0;
-  padding: 10px;
-  text-align: left;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  font-weight: 600;
-  border-bottom: 2px solid #ddd;
-}
-
-.json-list-item {
-  border-bottom: 1px solid #eee;
-}
-
-.json-list-item:hover {
-  background-color: #f9f9f9;
-}
-
-.json-list-key {
-  padding: 8px 10px;
-  font-weight: 500;
-  color: #7a3e9d;
-  width: 40%;
-  vertical-align: top;
-}
-
-/* Array indices should be displayed differently */
-.json-list-key[data-is-array="true"] {
-  color: #ff6600; /* Orange for array indices */
-}
-
-.json-list-value {
-  padding: 8px 10px;
-  width: 60%;
-  word-break: break-word;
-}
-
-.json-display {
-  padding: 10px;
-  border-radius: 4px;
-  background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.json-item {
-  margin: 3px 0;
-}
-
-.json-key {
-  color: #7a3e9d;
-  font-weight: bold;
 }
 
 .loading {
@@ -638,4 +533,12 @@ header {
   color: #999;
   font-style: italic;
   padding: 8px;
+  align-items: center;
+  height: 100%;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  border: 1px dashed #ddd;
+  color: #666;
+  text-align: center;
+  padding: 20px;
 }
