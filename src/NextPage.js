@@ -1,6 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+import { Line, Bar } from 'react-chartjs-2';
 import './NextPage.css';
+
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 function NextPage() {
   const [jsonData, setJsonData] = useState(null);
@@ -198,7 +222,6 @@ function NextPage() {
       );
     }
 
-    // Object
     return (
       <div className="detail-object">
         {Object.entries(data).length === 0 ? (
@@ -208,7 +231,7 @@ function NextPage() {
             <div key={key} className="detail-property">
               <div className="detail-property-key">
                 {key}
-                {key === 'maritalStatus' && <span className="important-tag">Important</span>}
+                {key === 'maritalStatus'}
               </div>
               <div className="detail-property-value">
                 {renderDetailedProperties(value, path ? `${path}.${key}` : key)}
@@ -222,6 +245,60 @@ function NextPage() {
 
   // Detail Modal Component
   const DetailModal = ({ item, onClose }) => {
+    const [activeGraph, setActiveGraph] = useState('vitals');
+    
+    const generateGraphData = (data) => {
+      // Extract patient data for graphs
+      const vitalsData = {
+        labels: ['Blood Pressure', 'Heart Rate', 'Temperature', 'Respiratory Rate'],
+        datasets: [{
+          label: 'Vital Signs',
+          data: [
+            data.bloodPressure || 120,
+            data.heartRate || 80,
+            data.temperature || 98.6,
+            data.respiratoryRate || 16
+          ],
+          backgroundColor: 'rgba(122, 62, 157, 0.5)',
+          borderColor: 'rgba(122, 62, 157, 1)',
+          borderWidth: 1
+        }]
+      };
+
+      const labData = {
+        labels: ['Glucose', 'Cholesterol', 'WBC', 'RBC'],
+        datasets: [{
+          label: 'Lab Results',
+          data: [
+            data.glucose || 100,
+            data.cholesterol || 180,
+            data.wbc || 7.5,
+            data.rbc || 4.5
+          ],
+          backgroundColor: 'rgba(53, 162, 235, 0.5)',
+          borderColor: 'rgba(53, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      };
+
+      return { vitalsData, labData };
+    };
+
+    const { vitalsData, labData } = generateGraphData(item.data);
+
+    const options = {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Patient Data Visualization',
+        },
+      },
+    };
+
     if (!item) return null;
 
     return (
@@ -233,6 +310,29 @@ function NextPage() {
           </div>
           <div className="detail-modal-body">
             {renderDetailedProperties(item.data)}
+            
+            <div className="graph-container">
+              <div className="graph-tabs">
+                <button 
+                  className={`graph-tab ${activeGraph === 'vitals' ? 'active' : ''}`}
+                  onClick={() => setActiveGraph('vitals')}
+                >
+                  Vital Signs
+                </button>
+                <button 
+                  className={`graph-tab ${activeGraph === 'lab' ? 'active' : ''}`}
+                  onClick={() => setActiveGraph('lab')}
+                >
+                  Lab Results
+                </button>
+              </div>
+              
+              {activeGraph === 'vitals' ? (
+                <Bar options={options} data={vitalsData} />
+              ) : (
+                <Line options={options} data={labData} />
+              )}
+            </div>
           </div>
           <div className="detail-modal-footer">
             <button className="detail-modal-button" onClick={onClose}>Close</button>
@@ -263,8 +363,7 @@ function NextPage() {
           <div className="loading">Loading JSON data...</div>
         )}
       </div>
-      
-      {/* Detail Modal */}
+    
       {showDetailModal && selectedItem && (
         <DetailModal 
           item={selectedItem} 
