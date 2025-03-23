@@ -116,8 +116,6 @@ function App() {
             };
           });
           
-          // Special case: if the only error is about type at root level and we have an array,
-          // we'll consider it valid
           if (Array.isArray(parsedJson) && 
               enhancedErrors.length === 1 && 
               enhancedErrors[0].keyword === 'type' && 
@@ -293,7 +291,7 @@ function App() {
           localStorage.setItem('validatedJSON', JSON.stringify(parsedJSON));
           localStorage.setItem('editorJSON', value); // Store the formatted editor content
           
-          alert("JSON is valid! Navigating to next page...");
+          // alert("JSON is valid! Navigating to next page...");
           // Navigate to the next page
           navigate('/next-page');
         } catch (e) {
@@ -319,7 +317,6 @@ function App() {
             <input {...getInputProps()} />
             <button className="btn">Upload JSON</button>
           </div>
-          {!isValid && <span className="error-message">Invalid JSON</span>}
         </div>
       </header>
       <div className="editor-container">
