@@ -287,12 +287,9 @@ function App() {
         // Store the complete JSON data
         try {
           const parsedJSON = JSON.parse(value);
-          // Store the validated JSON in localStorage (complete data)
           localStorage.setItem('validatedJSON', JSON.stringify(parsedJSON));
           localStorage.setItem('editorJSON', value); // Store the formatted editor content
           
-          // alert("JSON is valid! Navigating to next page...");
-          // Navigate to the next page
           navigate('/next-page');
         } catch (e) {
           setIsValid(false);

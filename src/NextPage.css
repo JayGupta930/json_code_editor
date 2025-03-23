@@ -7,6 +7,19 @@
   background-color: #f5f5f5;
 }
 
+.next-page {
+  color: black;
+}
+
+.next-page h1 {
+  font-size: 2.5rem;
+  margin: 0;
+  padding: 20px 0;
+  text-align: center;
+  background-color: #252526;
+  color: white;
+}
+
 header {
   display: flex;
   justify-content: space-between;
@@ -14,6 +27,8 @@ header {
   padding: 16px 24px;
   background-color: #252526;
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eaeaea;
 }
 
 .header-controls {
@@ -23,17 +38,19 @@ header {
 
 .back-btn {
   padding: 8px 16px;
-  background-color: #4a4a4a;
+  background-color: #2e4edb;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.2s;
+  font-weight: 500;
+  padding: 8px 15px;
 }
 
 .back-btn:hover {
-  background-color: #3a3a3a;
+  background-color: #e0e0e0;
 }
 
 .json-content {
@@ -279,14 +296,72 @@ header {
 }
 
 .view-details-btn {
-  padding: 8px 16px;
-  border: 2px solid blueviolet;
-  background-color: blueviolet;
-  color: white;
-  border-radius: 4px;
+  padding: 10px 16px;
+  background-color: #4285f4;
+  color: black;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(66, 133, 244, 0.2);
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.view-details-btn:hover {
+  background-color: #3367d6;
+  box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
+  transform: translateY(-2px);
+}
+
+.view-details-btn:active {
+  background-color: #2850a7;
+  box-shadow: 0 1px 3px rgba(66, 133, 244, 0.3);
+  transform: translateY(1px);
+  transition: all 0.1s ease;
+}
+
+.view-details-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.4);
+}
+
+.view-details-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  color: black;
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.view-details-btn:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
 }
 
 .card-content::-webkit-scrollbar-track {
@@ -541,4 +616,883 @@ header {
   color: #666;
   text-align: center;
   padding: 20px;
+}
+
+/* Patient Cards */
+.patient-cards {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 40px;
+}
+
+.patient-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  border: 2px solid black;
+  padding: 24px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #e6e9ed;
+  position: relative;
+  overflow: hidden;
+}
+
+.patient-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  border-color: #d0d7de;
+}
+
+.patient-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(66, 133, 244, 0.05), rgba(66, 133, 244, 0.15));
+  transform: skewX(-15deg) translateX(70%);
+  transition: transform 0.5s ease;
+}
+
+.patient-card:hover::after {
+  transform: skewX(-15deg) translateX(60%);
+}
+
+.patient-card h2 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.patient-card h2::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background-color: #4285f4;
+  transition: width 0.3s ease;
+}
+
+.patient-card:hover h2::after {
+  width: 80px;
+}
+
+.patient-info {
+  margin-bottom: 20px;
+}
+
+.patient-info p {
+  margin: 10px 0;
+  font-size: 0.95rem;
+  color: #57606f;
+  display: flex;
+  justify-content: space-between;
+}
+
+.patient-info p strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.view-details-btn {
+  padding: 10px 16px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(66, 133, 244, 0.2);
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.view-details-btn:hover {
+  background-color: #3367d6;
+  box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
+  transform: translateY(-2px);
+}
+
+.view-details-btn:active {
+  background-color: #2850a7;
+  box-shadow: 0 1px 3px rgba(66, 133, 244, 0.3);
+  transform: translateY(1px);
+  transition: all 0.1s ease;
+}
+
+.view-details-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.4);
+}
+
+.view-details-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.view-details-btn:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
+}
+
+.view-details-btn:hover {
+  background-color: #3367d6;
+  box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
+  transform: translateY(-2px);
+}
+
+.card-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 3px;
+}
+
+.card-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.card-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced styling for JSON types */
+.json-string {
+  color: #008000;
+  background-color: rgba(0, 128, 0, 0.05);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.json-number {
+  color: #0000ff;
+  background-color: rgba(0, 0, 255, 0.05);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.json-boolean {
+  color: #ff8c00;
+  background-color: rgba(255, 140, 0, 0.05);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.json-null {
+  color: #999;
+  background-color: rgba(153, 153, 153, 0.05);
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-style: italic;
+}
+
+/* Card highlight for important information like marital status */
+.card-highlight {
+  margin-top: 20px;
+  padding: 15px;
+  background: linear-gradient(to right, #f2f8ff, #e6f3ff);
+  border-left: 4px solid #0e639c;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(14, 99, 156, 0.1);
+  transition: transform 0.2s;
+}
+
+.card-highlight:hover {
+  transform: translateY(-3px);
+}
+
+.highlight-label {
+  font-weight: 600;
+  color: #0e639c;
+}
+
+.highlight-value {
+  padding: 5px 10px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(14, 99, 156, 0.2);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 18px;
+  color: #666;
+}
+
+/* Detail Modal Styles */
+.detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+}
+
+.detail-modal-content {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  width: 80%;
+  max-width: 900px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.detail-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #eee;
+}
+
+.detail-modal-title {
+  margin: 0;
+  font-size: 22px;
+  color: #333;
+}
+
+.detail-modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #666;
+  line-height: 1;
+}
+
+.detail-modal-close:hover {
+  color: #333;
+}
+
+.detail-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.detail-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.detail-modal-button {
+  padding: 8px 16px;
+  background-color: #0e639c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.detail-modal-button:hover {
+  background-color: #1177bb;
+}
+
+/* Detail View Styles */
+.detail-object {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-property {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.detail-property:last-child {
+  border-bottom: none;
+}
+
+.detail-property-key {
+  font-weight: 600;
+  color: #7a3e9d;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+}
+
+.important-tag {
+  margin-left: 8px;
+  font-size: 12px;
+  color: white;
+  background-color: #e91e63;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 400;
+}
+
+.detail-property-value {
+  padding-left: 16px;
+}
+
+.detail-array {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-array-item {
+  display: flex;
+  border-left: 2px solid #8a2be2;
+  padding-left: 8px;
+}
+
+.detail-array-index {
+  font-weight: 600;
+  color: #ff6600;
+  padding: 4px 8px;
+  min-width: 40px;
+}
+
+.detail-array-value {
+  flex: 1;
+}
+
+.detail-empty-array, .detail-empty-object {
+  color: #999;
+  font-style: italic;
+  padding: 8px;
+  align-items: center;
+  height: 100%;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  border: 1px dashed #ddd;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Patient Cards */
+.patient-cards {
+  margin-top: 40px;
+  margin-left: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 40px;
+}
+
+.patient-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid black;
+  position: relative;
+  overflow: hidden;
+}
+
+.patient-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  border-color: #d0d7de;
+}
+
+.patient-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(66, 133, 244, 0.05), rgba(66, 133, 244, 0.15));
+  transform: skewX(-15deg) translateX(70%);
+  transition: transform 0.5s ease;
+}
+
+.patient-card:hover::after {
+  transform: skewX(-15deg) translateX(60%);
+}
+
+.patient-card h2 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.patient-card h2::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background-color: #4285f4;
+  transition: width 0.3s ease;
+}
+
+.patient-card:hover h2::after {
+  width: 80px;
+}
+
+.patient-info {
+  margin-bottom: 20px;
+}
+
+.patient-info p {
+  margin: 10px 0;
+  font-size: 0.95rem;
+  color: #57606f;
+  display: flex;
+  justify-content: space-between;
+}
+
+.patient-info p strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.view-details-btn {
+  padding: 10px 16px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(66, 133, 244, 0.2);
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.view-details-btn:hover {
+  background-color: #3367d6;
+  box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
+  transform: translateY(-2px);
+}
+
+.view-details-btn:active {
+  background-color: #2850a7;
+  box-shadow: 0 1px 3px rgba(66, 133, 244, 0.3);
+  transform: translateY(1px);
+  transition: all 0.1s ease;
+}
+
+.view-details-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.4);
+}
+
+.view-details-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.view-details-btn:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
+}
+
+/* Also improve the test view button for consistency */
+.view-test-btn {
+  background-color: #34a853;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-top: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(52, 168, 83, 0.2);
+}
+
+.view-test-btn:hover {
+  background-color: #2d8d48;
+  box-shadow: 0 4px 8px rgba(52, 168, 83, 0.3);
+  transform: translateY(-2px);
+}
+
+.view-test-btn:active {
+  background-color: #24733a;
+  box-shadow: 0 1px 3px rgba(52, 168, 83, 0.3);
+  transform: translateY(1px);
+  transition: all 0.1s ease;
+}
+
+.view-test-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.4);
+}
+
+.view-test-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.view-test-btn:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  color: #333;
+}
+
+.patient-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.details-column {
+  flex: 1;
+  min-width: 200px;
+}
+
+.details-column p {
+  margin: 8px 0;
+}
+
+.medical-section {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.medical-section h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.tests-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.test-card {
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  padding: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.test-card:hover {
+  background-color: #e9e9e9;
+}
+
+.view-test-btn {
+  background-color: #34a853;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-top: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.view-test-btn:hover {
+  background-color: #2d8d48;
+}
+
+.view-test-btn:active {
+  background-color: #24733a;
+  box-shadow: 0 1px 3px rgba(52, 168, 83, 0.3);
+  transform: translateY(1px);
+  transition: all 0.1s ease;
+}
+
+.view-test-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.4);
+}
+
+.view-test-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.view-test-btn:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+.close-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Test modal specific styles */
+.test-modal {
+  max-width: 1000px;
+}
+
+.chart-container {
+  height: 400px;
+  margin: 20px 0;
+  position: relative;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  padding: 16px;
+  overflow: hidden; /* Ensures nothing extends outside the container */
+}
+
+.chart-container canvas {
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(240,248,255,0.5) 100%);
+}
+
+.chart-controls {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.chart-controls button {
+  background-color: #673ab7;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.chart-controls button:hover {
+  background-color: #5e35b1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Chart tooltips */
+.chartjs-tooltip {
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  border: 1px solid #eee;
+  padding: 8px 12px;
+  max-width: 200px;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Enhanced annotation styles that will be applied via Chart.js */
+.annotation-label {
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-weight: 500;
+  font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Legend and tooltip styling */
+.custom-chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 50%;
+}
+
+/* Annotation tooltip */
+.annotation-tooltip {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border-radius: 4px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  max-width: 200px;
+  font-size: 13px;
+}
+
+.notes-section {
+  margin: 20px 0;
+}
+
+.notes-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.note-item {
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.note-item p {
+  margin: 5px 0;
 }

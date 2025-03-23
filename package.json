@@ -10,6 +10,8 @@
     "@mui/x-charts": "^6.0.0",
     "ajv": "^8.12.0",
     "chart.js": "^4.4.0",
+    "chartjs-plugin-annotation": "^3.0.1",
+    "chartjs-plugin-zoom": "^2.2.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
