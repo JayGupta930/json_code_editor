@@ -49,10 +49,6 @@ header {
   padding: 8px 15px;
 }
 
-.back-btn:hover {
-  background-color: #e0e0e0;
-}
-
 .json-content {
   flex: 1;
   overflow: auto;
@@ -623,7 +619,7 @@ header {
   margin-top: 40px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 40px;
+  gap: 30px;
 }
 
 .patient-card {
@@ -634,7 +630,6 @@ header {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 1px solid #e6e9ed;
   position: relative;
   overflow: hidden;
 }
@@ -642,7 +637,6 @@ header {
 .patient-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
-  border-color: #d0d7de;
 }
 
 .patient-card::after {
@@ -1033,8 +1027,10 @@ header {
 
 /* Patient Cards */
 .patient-cards {
-  margin-top: 40px;
-  margin-left: 40px;
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 20px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 40px;
@@ -1047,7 +1043,7 @@ header {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 2px solid black;
+  border-color: #d0d7de;
   position: relative;
   overflow: hidden;
 }
@@ -1055,7 +1051,7 @@ header {
 .patient-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
-  border-color: #d0d7de;
+  border: 2px solid black;
 }
 
 .patient-card::after {
@@ -1495,4 +1491,46 @@ header {
 
 .note-item p {
   margin: 5px 0;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  position: relative;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 12px;
+  padding-right: 32px; /* Add space for the close button */
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10; /* Ensure button stays above other content */
+  background-color: rgba(0, 0, 0, 0.03); /* Light background for better visibility */
+}
+
+.modal-close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #000;
+  transform: scale(1.1);
+}
+
+.modal-close-btn:active {
+  transform: scale(0.95);
+  background-color: rgba(0, 0, 0, 0.15);
 }

@@ -19,6 +19,26 @@ ChartJS.register(
   annotationPlugin  // Register the annotation plugin
 );
 
+// Enhanced Close Icon component with better visibility
+const CloseIcon = () => (
+  <svg 
+    width="24" 
+    height="24" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ display: 'block' }} // Ensure icon displays properly
+  >
+    <path 
+      d="M18 6L6 18M6 6L18 18" 
+      stroke="currentColor" 
+      strokeWidth="2.5" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 function NextPage() {
   const [jsonData, setJsonData] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null); 
@@ -122,7 +142,12 @@ function NextPage() {
     return (
       <div className="modal-overlay" onClick={closePatientDetails}>
         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-          <h2>{selectedItem.name}</h2>
+          <div className="modal-header">
+            <h2>{selectedItem.name}</h2>
+            <button className="modal-close-btn" onClick={closePatientDetails}>
+              <CloseIcon />
+            </button>
+          </div>
           <div className="patient-details">
             <div className="details-column">
               <p><strong>ID:</strong> {selectedItem.patientId}</p>
@@ -168,8 +193,6 @@ function NextPage() {
               </div>
             ))}
           </div>
-          
-          <button className="close-btn" onClick={closePatientDetails}>Close</button>
         </div>
       </div>
     );
@@ -387,7 +410,12 @@ function NextPage() {
     return (
       <div className="modal-overlay" onClick={closeTestDetails}>
         <div className="modal-content test-modal" onClick={(e) => e.stopPropagation()}>
-          <h2>Test Details</h2>
+          <div className="modal-header">
+            <h2>Test Details</h2>
+            <button className="modal-close-btn" onClick={closeTestDetails}>
+              <CloseIcon />
+            </button>
+          </div>
           <p><strong>Date:</strong> {formatDate(selectedTest.createdAt)}</p>
           
           <div className="clinical-notes">
@@ -433,8 +461,6 @@ function NextPage() {
               <p>No notes available for this test</p>
             )}
           </div>
-          
-          <button className="close-btn" onClick={closeTestDetails}>Close</button>
         </div>
       </div>
     );
