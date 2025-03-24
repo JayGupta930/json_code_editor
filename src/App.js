@@ -10,9 +10,10 @@ function App() {
   const [isValid, setIsValid] = useState(true);
   const [validationErrors, setValidationErrors] = useState([]);
   const [schema, setSchema] = useState(null);
+  const [showUploadAlert, setShowUploadAlert] = useState(false);
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
-  const navigate = useNavigate(); // Add navigate hook
+  const navigate = useNavigate();
 
   // Initialize AJV validator
   const ajv = new Ajv({ allErrors: true });
@@ -259,6 +260,7 @@ function App() {
           JSON.parse(content); // Just check if it's valid JSON
           setCode(content);
           validateJsonContent(content);
+          setShowUploadAlert(false); // Close the alert on success
         } catch (e) {
           alert('Invalid JSON file!');
         }
@@ -267,12 +269,23 @@ function App() {
     }
   };
 
-  const { getRootProps, getInputProps } = useDropzone({ 
+  // Dropzone for the main component
+  const { getRootProps: getMainRootProps, getInputProps: getMainInputProps } = useDropzone({ 
     onDrop,
     accept: {
       'application/json': ['.json']
     },
-    maxFiles: 1
+    maxFiles: 1,
+    noClick: showUploadAlert, // Disable clicks when alert is showing
+  });
+
+  // Separate dropzone for the alert dialog
+  const { getRootProps: getAlertRootProps, getInputProps: getAlertInputProps } = useDropzone({ 
+    onDrop,
+    accept: {
+      'application/json': ['.json']
+    },
+    maxFiles: 1,
   });
 
   // Enhanced validation with proper error display and navigation
@@ -307,12 +320,17 @@ function App() {
   return (
     <div className="app-container">
       <header>
-        <h1>JSON Code Editor</h1>
+        <div className="title-container">
+          <h1>JSON Code Editor <span className="version">v1.0.0</span></h1>
+        </div>
         <div className="controls">
           <button onClick={formatJSON} className="btn">Format JSON</button>
-          <div {...getRootProps({ className: 'dropzone' })}>
-            <input {...getInputProps()} />
-            <button className="btn">Upload JSON</button>
+          <div {...getMainRootProps({ className: 'dropzone' })}>
+            <input {...getMainInputProps()} />
+            <button className="btn" onClick={(e) => {
+              e.stopPropagation();
+              setShowUploadAlert(true);
+            }}>Upload JSON</button>
           </div>
         </div>
       </header>
@@ -376,6 +394,35 @@ function App() {
           </ul>
         </div>
       )}
+
+      {/* Beautiful Upload JSON Alert */}
+      <div className={`alert-overlay ${showUploadAlert ? 'show' : ''}`} onClick={() => setShowUploadAlert(false)}>
+        <div className="alert-card" onClick={(e) => e.stopPropagation()}>
+          <div className="alert-header">
+            <div className="alert-icon">📁</div>
+            <h3 className="alert-title">Upload JSON File</h3>
+          </div>
+          <div className="alert-message">
+            Select or drag and drop a JSON file to import into the editor.
+            Your current data will be replaced with the loaded file content.
+          </div>
+          
+          <div {...getAlertRootProps({ className: 'alert-dropzone' })}>
+            <input {...getAlertInputProps()} />
+            <div className="alert-dropzone-icon">⬆️</div>
+            <div className="alert-dropzone-text">Drag & drop your JSON file here, or click to select</div>
+          </div>
+          
+          <div className="alert-actions">
+            <button 
+              className="alert-button alert-button-cancel" 
+              onClick={() => setShowUploadAlert(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
