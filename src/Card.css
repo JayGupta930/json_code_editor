@@ -1,0 +1,517 @@
+/* Enhanced Cards View Styling */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 300px);
+  gap: 150px;
+  padding: 16px 8px;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+  flex: 1;
+  overflow: auto;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.json-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 2px solid black;
+  width: 350px;
+  height: 400px;
+}
+
+.json-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card-object {
+  --card-color-primary: #7a3e9d;
+  --card-color-secondary: #9c4dcc;
+}
+
+.card-array {
+  --card-color-primary: #8a2be2;
+  --card-color-secondary: #b44dff;
+}
+
+.card-string {
+  --card-color-primary: #008000;
+  --card-color-secondary: #00b300;
+}
+
+.card-number {
+  --card-color-primary: #0000ff;
+  --card-color-secondary: #4d4dff;
+}
+
+.card-boolean {
+  --card-color-primary: #ff8c00;
+  --card-color-secondary: #ffb84d;
+}
+
+.card-null {
+  --card-color-primary: #999;
+  --card-color-secondary: #bbb;
+}
+
+.card-header {
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to bottom, #fafafa, rgba(250, 250, 250, 0.8));
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+  letter-spacing: -0.5px;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.card-type-badge {
+  background: rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(4px);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--card-color-primary);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.card-content {
+  padding: 20px;
+  flex: 1;
+  overflow: auto;
+  max-height: 250px;
+  background-color: #fffffc;
+  position: relative;
+}
+
+.card-single-value {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 30px 0;
+  word-break: break-word;
+  text-align: center;
+}
+
+.card-properties, .card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+} 
+
+.card-property, .card-list-item {
+  display: flex;
+  padding: 8px 2px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.15s;
+}
+
+.card-property:hover, .card-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.card-property-key, .card-list-index {
+  font-weight: 600;
+  margin-right: 10px;
+  color: var(--card-color-primary);
+  min-width: 100px;
+  position: relative;
+  padding-left: 8px;
+}
+
+.card-property-key::before, .card-list-index::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 70%;
+  background-color: var(--card-color-primary);
+  opacity: 0.6;
+  border-radius: 2px;
+}
+
+.card-list-index {
+  color: #ff6600;
+}
+
+.card-property-value, .card-list-value {
+  flex: 1;
+  word-break: break-word;
+  padding: 0 5px;
+  font-family: 'SF Mono', 'Consolas', monospace;
+}
+
+.card-more-properties, .card-more-items {
+  color: #777;
+  font-style: italic;
+  padding: 10px 0;
+  text-align: center;
+  background: linear-gradient(to bottom, transparent, rgba(245, 245, 245, 0.5));
+  border-radius: 0 0 4px 4px;
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.card-empty-object, .card-empty-array {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 30px 0;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  border: 1px dashed #ddd;
+}
+
+.card-footer {
+  padding: 16px 20px;
+  background-color: #fafafa;
+  border-top: 1px solid #eee;
+  text-align: right;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(122, 62, 157, 0.2), transparent);
+}
+
+/* Styled scrollbars for card content */
+.card-content::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.card-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 3px;
+}
+
+.card-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.card-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Patient Cards */
+.patient-cards {
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 40px;
+}
+
+.patient-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-color: #d0d7de;
+  position: relative;
+  overflow: hidden;
+}
+
+.patient-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  border: 2px solid black;
+}
+
+.patient-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(66, 133, 244, 0.05), rgba(66, 133, 244, 0.15));
+  transform: skewX(-15deg) translateX(70%);
+  transition: transform 0.5s ease;
+}
+
+.patient-card:hover::after {
+  transform: skewX(-15deg) translateX(60%);
+}
+
+.patient-card h2 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.patient-card h2::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background-color: #4285f4;
+  transition: width 0.3s ease;
+}
+
+.patient-card:hover h2::after {
+  width: 80px;
+}
+
+.patient-info {
+  margin-bottom: 20px;
+}
+
+.patient-info p {
+  margin: 10px 0;
+  font-size: 0.95rem;
+  color: #57606f;
+  display: flex;
+  justify-content: space-between;
+}
+
+.patient-info p strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.view-details-btn {
+  padding: 10px 16px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(66, 133, 244, 0.2);
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.view-details-btn:hover {
+  background-color: #3367d6;
+  box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
+  transform: translateY(-2px);
+}
+
+.view-details-btn:active {
+  background-color: #2850a7;
+  box-shadow: 0 1px 3px rgba(66, 133, 244, 0.3);
+  transform: translateY(1px);
+  transition: all 0.1s ease;
+}
+
+.view-details-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.4);
+}
+
+.view-details-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.view-details-btn:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
+}
+
+/* Also improve the test view button for consistency */
+.view-test-btn {
+  background-color: #34a853;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-top: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(52, 168, 83, 0.2);
+}
+
+.view-test-btn:hover {
+  background-color: #2d8d48;
+  box-shadow: 0 4px 8px rgba(52, 168, 83, 0.3);
+  transform: translateY(-2px);
+}
+
+.view-test-btn:active {
+  background-color: #24733a;
+  box-shadow: 0 1px 3px rgba(52, 168, 83, 0.3);
+  transform: translateY(1px);
+  transition: all 0.1s ease;
+}
+
+.view-test-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.4);
+}
+
+.view-test-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.view-test-btn:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+/* Card highlight for important information like marital status */
+.card-highlight {
+  margin-top: 20px;
+  padding: 15px;
+  background: linear-gradient(to right, #f2f8ff, #e6f3ff);
+  border-left: 4px solid #0e639c;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(14, 99, 156, 0.1);
+  transition: transform 0.2s;
+}
+
+.card-highlight:hover {
+  transform: translateY(-3px);
+}
+
+.highlight-label {
+  font-weight: 600;
+  color: #0e639c;
+}
+
+.highlight-value {
+  padding: 5px 10px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(14, 99, 156, 0.2);
+}
+
+/* Enhanced styling for JSON types */
+.json-string {
+  color: #008000;
+  background-color: rgba(0, 128, 0, 0.05);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.json-number {
+  color: #0000ff;
+  background-color: rgba(0, 0, 255, 0.05);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.json-boolean {
+  color: #ff8c00;
+  background-color: rgba(255, 140, 0, 0.05);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.json-null {
+  color: #999;
+  background-color: rgba(153, 153, 153, 0.05);
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-style: italic;
+}
+
+/* Tests container */
+.tests-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.test-card {
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  padding: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.test-card:hover {
+  background-color: #e9e9e9;
+}
