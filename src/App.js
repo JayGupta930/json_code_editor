@@ -336,7 +336,7 @@ function App() {
       </header>
       <div className="editor-container">
         <Editor
-          height="90vh"
+          height="calc(90vh - 70px)" /* Adjusted height to account for bottom padding */
           defaultLanguage="json"
           value={code}
           onChange={setCode}
@@ -348,10 +348,11 @@ function App() {
             folding: true,
             automaticLayout: true,
             formatOnPaste: true,
-            scrollBeyondLastLine: false,
+            scrollBeyondLastLine: true, /* Changed to true to allow scrolling beyond last line */
             tabSize: 2,
             renderValidationDecorations: 'on',
-            colorDecorators: true
+            colorDecorators: true,
+            padding: { top: 10, bottom: 20 } /* Added padding to the editor */
           }}
         />
       </div>
