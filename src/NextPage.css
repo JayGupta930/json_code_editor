@@ -491,3 +491,77 @@ header {
   transform: scale(0.95);
   background-color: rgba(0, 0, 0, 0.15);
 }
+
+/* Header action buttons layout */
+.card-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  position: relative;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 12px;
+}
+
+/* Header layout for shared view */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.shared-view-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.shared-badge {
+  background-color: #e1f5fe;
+  color: #0288d1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+}
+
+.shared-badge::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #0288d1;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.minimal-patient-info {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.limited-data-notice {
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #fff4e5;
+  border-left: 4px solid #ff9800;
+  color: #663c00;
+  font-size: 14px;
+  border-radius: 4px;
+}

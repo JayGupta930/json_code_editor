@@ -1,0 +1,396 @@
+.share-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4285f4;
+  display: flex;
+  margin-bottom: 10px;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  background-color: rgba(66, 133, 244, 0.1);
+  z-index: 5; /* Ensure it's above other elements for clicking */
+}
+
+.share-btn:hover {
+  background-color: rgba(66, 133, 244, 0.2);
+  transform: scale(1.1);
+}
+
+.share-btn:active {
+  transform: scale(0.95);
+}
+
+/* Active share button state */
+.share-btn.active-share {
+  background-color: rgba(52, 168, 83, 0.2);
+  color: #34a853;
+}
+
+/* Shared badge for patients that are being viewed through a shared link */
+.shared-badge {
+  font-size: 12px;
+  background-color: #34a853;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  font-weight: 400;
+  vertical-align: middle;
+}
+
+/* Enhanced Share dialog styles */
+.share-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.share-dialog {
+  position: relative;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+  width: 400px;
+  max-width: 90vw;
+  z-index: 2001;
+  animation: scaleInDialog 0.3s ease forwards;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@keyframes scaleInDialog {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+}
+
+.share-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background-color: #f8f9fa;
+  position: relative;
+}
+
+.share-dialog-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    rgba(66, 133, 244, 0), 
+    rgba(66, 133, 244, 0.3), 
+    rgba(66, 133, 244, 0)
+  );
+}
+
+.share-dialog-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+  font-weight: 600;
+}
+
+.share-dialog-patient-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 20px;
+  background-color: #f0f7ff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.patient-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4285f4, #34a853);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.patient-details-summary {
+  flex: 1;
+}
+
+.patient-details-summary h4 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.patient-details-summary p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.share-dialog-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.share-dialog-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.qr-code-label {
+  font-size: 13px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.qr-loading {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+  color: #666;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.qr-code-fallback {
+  border-radius: 4px;
+}
+
+.qr-code-note {
+  font-size: 11px;
+  color: #666;
+  margin-top: 5px;
+  background-color: #ffffd9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #e6e6b8;
+  text-align: center;
+  max-width: 200px;
+}
+
+.share-dialog-link {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.share-dialog-link label {
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+}
+
+.copy-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.share-dialog-link input {
+  width: 100%;
+  padding: 12px 50px 12px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  background-color: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.share-dialog-link input:focus {
+  outline: none;
+  border-color: #4285f4;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+}
+
+.copy-button {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+  background-color: #1a73e8;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.copy-button:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.share-dialog-options {
+  padding: 0 20px 20px;
+}
+
+.share-dialog-options h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.share-methods {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.share-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+  min-width: 100px;
+}
+
+.share-option:hover {
+  background-color: #f1f3f4;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.share-option:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.share-dialog-footer {
+  padding: 10px 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background-color: #f8f9fa;
+}
+
+.share-dialog-footer p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+}
+
+/* Share notification styles */
+.share-notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #323232;
+  color: white;
+  padding: 0;
+  border-radius: 4px;
+  z-index: 2000;
+  animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+}
+
+.notification-content span {
+  background-color: #4caf50;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  margin-right: 12px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to { opacity: 0; transform: translate(-50%, 20px); }
+}
+
+.share-dialog-data-preview {
+  padding: 12px 20px;
+  background-color: #f5f7ff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.share-dialog-data-preview h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #444;
+  font-weight: 500;
+}
+
+.data-preview {
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  font-family: monospace;
+  font-size: 12px;
+  color: #444;
+  max-height: 80px;
+  overflow-y: auto;
+  word-break: break-all;
+}

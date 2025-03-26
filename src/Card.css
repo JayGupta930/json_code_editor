@@ -272,17 +272,30 @@
   transform: skewX(-15deg) translateX(60%);
 }
 
+/* Update patient-card h2 for share button space */
 .patient-card h2 {
   margin-top: 0;
   color: #2c3e50;
   font-size: 1.5rem;
-  border-bottom: 2px solid #ecf0f1;
   padding-bottom: 12px;
   margin-bottom: 16px;
   position: relative;
 }
 
-.patient-card h2::after {
+.card-header-actions {
+  width: 100%;
+  border-bottom: 2px solid #ecf0f1;
+  margin-bottom: 16px;
+}
+
+.card-header-actions h2 {
+  margin: 0;
+  padding: 0;
+  border: none;
+  margin-bottom: 0;
+}
+
+.card-header-actions::after {
   content: '';
   position: absolute;
   bottom: -2px;
@@ -293,7 +306,7 @@
   transition: width 0.3s ease;
 }
 
-.patient-card:hover h2::after {
+.patient-card:hover .card-header-actions::after {
   width: 80px;
 }
 
