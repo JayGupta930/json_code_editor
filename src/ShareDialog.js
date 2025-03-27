@@ -1,49 +1,6 @@
 /* eslint-disable no-unused-vars */
-import React, { useRef, useState, Suspense } from "react";
+import React, { useRef, useState } from "react";
 import "./ShareDialog.css";
-
-// QRCode component with dynamic imports and error handling
-const QRCodeComponent = React.lazy(() => {
-  return new Promise((resolve) => {
-    try {
-      // Try to import the module
-      import("qrcode.react")
-        .then((module) => resolve({ default: module.default }))
-        .catch(() => {
-          // If import fails, provide a fallback component
-          resolve({
-            default: ({ value, size }) => (
-              <div
-                className="qr-code-fallback"
-                style={{
-                  width: size,
-                  height: size,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: "#f0f0f0",
-                  color: "#666",
-                  border: "1px dashed #ccc",
-                  fontSize: "12px",
-                  textAlign: "center",
-                  padding: "8px",
-                }}
-              >
-                QR Code Unavailable
-                <br />
-                Please install qrcode.react
-              </div>
-            ),
-          });
-        });
-    } catch (error) {
-      console.warn("Error loading qrcode.react:", error);
-      resolve({
-        default: () => <div>QR Code unavailable</div>,
-      });
-    }
-  });
-});
 
 // Icon Components
 const CloseIcon = () => (
@@ -147,68 +104,120 @@ const ShareDialog = ({
   hideShareOptions = false, // New prop to control visibility of share options
 }) => {
   const [copied, setCopied] = useState(false);
+  const [shareError, setShareError] = useState(null);
   const inputRef = useRef(null);
-  
-  // Create a simplified QR code URL to prevent "Data too long" errors
-  const getQrCodeUrl = () => {
+
+  // Get the full share URL that includes all necessary data
+  const getFullShareUrl = () => {
     try {
+      // For sharing via copy link
+      const baseUrl = window.location.origin + window.location.pathname;
+      
       if (individualData) {
-        // Only include essential patient info in QR code URL to reduce size
-        const baseUrl = shareUrl.split('?')[0];
-        const essentialData = {
-          patientId: individualData.patientId,
-          name: individualData.name,
-          requiredData: true // Flag to indicate this is simplified data
-        };
-        return `${baseUrl}?qr=${btoa(JSON.stringify(essentialData))}`;
+        // For safety, limit what data we include in the URL
+        // Try using URL parameters instead of encoding the entire object
+        const params = new URLSearchParams();
+        
+        // Add each key individually instead of encoding the whole object
+        if (individualData.patientId) {
+          params.append('pid', individualData.patientId);
+        }
+        if (individualData.name) {
+          params.append('name', individualData.name);
+        }
+        // Add any other critical fields
+        
+        return `${baseUrl}?${params.toString()}`;
       }
-      return shareUrl;
+      
+      // Make sure shareUrl is a complete URL
+      if (shareUrl) {
+        if (!shareUrl.startsWith('http')) {
+          return `${window.location.origin}${shareUrl.startsWith('/') ? '' : '/'}${shareUrl}`;
+        }
+        return shareUrl;
+      }
+      
+      return baseUrl;
     } catch (error) {
-      console.error('Error creating QR code URL:', error);
-      // If there's an error, return a base URL pointing to the application
-      return window.location.origin;
+      console.error('Error creating full share URL:', error);
+      setShareError("Error generating shareable link. Please try again.");
+      return window.location.origin + window.location.pathname;
     }
   };
 
-  const qrCodeUrl = getQrCodeUrl();
+  const fullShareUrl = getFullShareUrl();
 
   if (!show) return null;
 
   const copyLink = () => {
     if (inputRef.current) {
       inputRef.current.select();
-      document.execCommand("copy");
-      setCopied(true);
-      setTimeout(() => setCopied(false), 3000);
-      if (onCopyLink) {
-        onCopyLink();
+      try {
+        // Try to use the modern clipboard API first
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(fullShareUrl)
+            .then(() => {
+              setCopied(true);
+              setTimeout(() => setCopied(false), 3000);
+              if (onCopyLink) onCopyLink();
+            })
+            .catch(err => {
+              console.error('Failed to copy with Clipboard API:', err);
+              // Fall back to execCommand
+              document.execCommand("copy");
+              setCopied(true);
+              setTimeout(() => setCopied(false), 3000);
+              if (onCopyLink) onCopyLink();
+            });
+        } else {
+          // Fall back to old method
+          document.execCommand("copy");
+          setCopied(true);
+          setTimeout(() => setCopied(false), 3000);
+          if (onCopyLink) onCopyLink();
+        }
+      } catch (err) {
+        console.error('Copy failed:', err);
+        setShareError("Failed to copy link. Please try again.");
       }
     }
   };
 
   const shareViaEmail = () => {
-    const subject = encodeURIComponent("Check out this shared content");
-    const body = encodeURIComponent(
-      `I thought you might be interested in this: ${shareUrl}`
-    );
-    window.open(`mailto:?subject=${subject}&body=${body}`);
+    try {
+      const subject = encodeURIComponent("Patient Information");
+      const body = encodeURIComponent(
+        `I'd like to share this patient information with you: ${fullShareUrl}`
+      );
+      window.open(`mailto:?subject=${subject}&body=${body}`);
 
-    // Call the prop function if provided
-    if (onEmailShare) {
-      onEmailShare();
+      // Call the prop function if provided
+      if (onEmailShare) {
+        onEmailShare();
+      }
+    } catch (error) {
+      console.error('Error sharing via email:', error);
+      setShareError("Error sharing via email. Please try again.");
     }
   };
 
   const shareViaWhatsApp = () => {
-    const text = encodeURIComponent(
-      `Check out this shared content: ${shareUrl}`
-    );
-    window.open(`https://wa.me/?text=${text}`);
-    // Call the prop function if provided
-    if (onWhatsAppShare) {
-      onWhatsAppShare();
+    try {
+      const text = encodeURIComponent(
+        `Patient Information: ${fullShareUrl}`
+      );
+      window.open(`https://wa.me/?text=${text}`);
+      // Call the prop function if provided
+      if (onWhatsAppShare) {
+        onWhatsAppShare();
+      }
+    } catch (error) {
+      console.error('Error sharing via WhatsApp:', error);
+      setShareError("Error sharing via WhatsApp. Please try again.");
     }
   };
+
   return (
     <div className="share-dialog-overlay" onClick={onClose}>
       <div className="share-dialog" onClick={(e) => e.stopPropagation()}>
@@ -218,6 +227,13 @@ const ShareDialog = ({
             <CloseIcon />
           </button>
         </div>
+
+        {/* Show any errors that might occur during sharing */}
+        {shareError && (
+          <div className="share-error-message">
+            {shareError}
+          </div>
+        )}
 
         {patientInfo && (
           <div className="share-dialog-patient-info">
@@ -251,26 +267,12 @@ const ShareDialog = ({
         {!hideShareOptions && (
           <>
             <div className="share-dialog-content">
-              <div className="share-dialog-qr">
-                <Suspense
-                  fallback={<div className="qr-loading">Loading QR code...</div>}
-                >
-                  <QRCodeComponent value={qrCodeUrl} size={150} />
-                </Suspense>
-                <div className="qr-code-label">Scan with your phone camera</div>
-                {qrCodeUrl !== shareUrl && (
-                  <div className="qr-code-note">
-                    Note: QR code contains simplified data. Use copy link for complete data.
-                  </div>
-                )}
-              </div>
-
               <div className="share-dialog-link">
                 <label>Share link</label>
                 <div className="copy-input-container">
                   <input
                     ref={inputRef}
-                    value={shareUrl}
+                    value={fullShareUrl}
                     readOnly
                     onClick={(e) => e.target.select()}
                   />

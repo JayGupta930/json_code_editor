@@ -94,7 +94,6 @@ function NextPage() {
       const searchParams = new URLSearchParams(location.search);
       const sharedPatientId = searchParams.get('patientId');
       const encodedData = searchParams.get('data');
-      const qrData = searchParams.get('qr');
       
       // First check for full encoded data
       if (encodedData) {
@@ -114,52 +113,6 @@ function NextPage() {
         }
       }
       
-      // Then check for QR code simplified data
-      if (qrData) {
-        try {
-          const qrDecodedData = JSON.parse(atob(qrData));
-          
-          // If this is simplified data from a QR code, we need to get the full patient data
-          if (qrDecodedData.requiredData) {
-            // Use localStorage to find the complete patient data by patientId
-            const storedData = localStorage.getItem('validatedJSON');
-            if (storedData) {
-              const parsedData = JSON.parse(storedData);
-              const fullPatientData = parsedData.find(
-                patient => patient.patientId === qrDecodedData.patientId
-              );
-              
-              if (fullPatientData) {
-                setJsonData(parsedData);
-                setFilteredData([fullPatientData]);
-                setIsSharedView(true);
-                setSelectedItem(fullPatientData);
-                setShowDetailModal(true);
-                return;
-              }
-            }
-            
-            // If we couldn't find the complete data, display a minimal version
-            // with what we have from the QR code
-            const minimalPatient = {
-              patientId: qrDecodedData.patientId,
-              name: qrDecodedData.name || 'Unknown Patient',
-              qrCodeOnly: true
-            };
-            
-            setJsonData([minimalPatient]);
-            setFilteredData([minimalPatient]);
-            setIsSharedView(true);
-            setSelectedItem(minimalPatient);
-            setShowDetailModal(true);
-            return;
-          }
-        } catch (qrDecodeError) {
-          console.error('Error decoding QR data:', qrDecodeError);
-        }
-      }
-      
-      // Then check for patient ID or use localStorage as before
       // Use localStorage data if no encoded data or if decoding failed
       const storedData = localStorage.getItem('validatedJSON');
       if (storedData) {
@@ -367,29 +320,6 @@ function NextPage() {
 
   const renderPatientDetails = () => {
     if (!selectedItem) return null;
-
-    // Special rendering for patients coming from QR codes with minimal data
-    if (selectedItem.qrCodeOnly) {
-      return (
-        <div className="modal-overlay" onClick={closePatientDetails}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{selectedItem.name}</h2>
-              <button className="modal-close-btn" onClick={closePatientDetails}>
-                <CloseIcon />
-              </button>
-            </div>
-            <div className="minimal-patient-info">
-              <p>Patient ID: {selectedItem.patientId}</p>
-              <p className="limited-data-notice">
-                Limited patient data is available from this QR code. 
-                For complete patient information, please ask the sender to share the full link instead.
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    }
 
     // Regular patient details rendering
     return (
