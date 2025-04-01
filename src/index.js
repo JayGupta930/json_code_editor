@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
 import App from "./App";
-import NextPage from "./NextPage";
+import Visualize from "./Visualize";
 import reportWebVitals from "./reportWebVitals";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -12,7 +12,7 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/next-page" element={<NextPage />} />
+        <Route path="/visualize" element={<Visualize />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./NextPage.css";
+import "./Visualize.css";
 import "./Card.css";
 import { Line } from "react-chartjs-2";
 import {
@@ -78,7 +78,7 @@ const ShareNotification = ({ show }) => {
   );
 };
 
-function NextPage() {
+function Visualize() {
   const [jsonData, setJsonData] = useState(null);
   const [filteredData, setFilteredData] = useState(null); // New state for filtered data
   const [selectedItem, setSelectedItem] = useState(null);
@@ -759,7 +759,7 @@ function NextPage() {
   };
 
   return (
-    <div className="next-page">
+    <div className="visualize">
       <header>
         <h1>
           {isSharedView
@@ -802,4 +802,4 @@ function NextPage() {
     </div>
   );
 }
-export default NextPage;
+export default Visualize;

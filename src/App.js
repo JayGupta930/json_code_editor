@@ -324,7 +324,7 @@ function App() {
           localStorage.setItem("validatedJSON", JSON.stringify(parsedJSON));
           localStorage.setItem("editorJSON", value); // Store the formatted editor content
 
-          navigate("/next-page");
+          navigate("/visualize");
         } catch (e) {
           setIsValid(false);
           alert(`JSON parsing error: ${e.message}`);
