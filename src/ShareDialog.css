@@ -12,7 +12,8 @@
   border-radius: 50%;
   transition: all 0.2s ease;
   background-color: rgba(66, 133, 244, 0.1);
-  z-index: 5; /* Ensure it's above other elements for clicking */
+  z-index: 5;
+  /* Ensure it's above other elements for clicking */
 }
 
 .share-btn:hover {
@@ -71,12 +72,13 @@
 }
 
 @keyframes scaleInDialog {
-  from { 
-    opacity: 0; 
+  from {
+    opacity: 0;
     transform: scale(0.9);
   }
-  to { 
-    opacity: 1; 
+
+  to {
+    opacity: 1;
     transform: scale(1);
   }
 }
@@ -98,11 +100,10 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, 
-    rgba(66, 133, 244, 0), 
-    rgba(66, 133, 244, 0.3), 
-    rgba(66, 133, 244, 0)
-  );
+  background: linear-gradient(90deg,
+      rgba(66, 133, 244, 0),
+      rgba(66, 133, 244, 0.3),
+      rgba(66, 133, 244, 0));
 }
 
 .share-dialog-header h3 {
@@ -313,13 +314,27 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translate(-50%, 20px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 @keyframes fadeOut {
-  from { opacity: 1; transform: translate(-50%, 0); }
-  to { opacity: 0; transform: translate(-50%, 20px); }
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
 }
 
 .share-dialog-data-preview {
