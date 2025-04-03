@@ -4,7 +4,7 @@ import { useDropzone } from "react-dropzone";
 import Ajv from "ajv";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
-import { version } from '../package.json';
+import { version } from "../package.json";
 
 function App() {
   const [code, setCode] = useState(
@@ -288,7 +288,6 @@ function App() {
 
           // Also store in sessionStorage for sharing functionality
           sessionStorage.setItem("uploadedJSON", content);
-          
         } catch (e) {
           alert("Invalid JSON file!");
         }
@@ -349,7 +348,7 @@ function App() {
   };
 
   // Add this at the top of your file, with other imports
-  
+
   return (
     <div className="app-container">
       <header>
