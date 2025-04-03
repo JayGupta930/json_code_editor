@@ -4,7 +4,7 @@ import { useDropzone } from "react-dropzone";
 import Ajv from "ajv";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
-import { version } from "../package.json";
+import packageJson from "../package.json";
 
 function App() {
   const [code, setCode] = useState(
@@ -354,7 +354,7 @@ function App() {
       <header>
         <div className="title-container">
           <h1>
-            JSON Code Editor <span className="version">v{version}</span>
+            JSON Code Editor <span className="version">v{packageJson.version}</span>
           </h1>
         </div>
         <div className="controls">
