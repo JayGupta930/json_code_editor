@@ -4,6 +4,7 @@ import { useDropzone } from "react-dropzone";
 import Ajv from "ajv";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
+import { version } from '../package.json';
 
 function App() {
   const [code, setCode] = useState(
@@ -347,12 +348,14 @@ function App() {
     }
   };
 
+  // Add this at the top of your file, with other imports
+  
   return (
     <div className="app-container">
       <header>
         <div className="title-container">
           <h1>
-            JSON Code Editor <span className="version">v1.0.0</span>
+            JSON Code Editor <span className="version">v{version}</span>
           </h1>
         </div>
         <div className="controls">
@@ -375,7 +378,7 @@ function App() {
       </header>
       <div className="editor-container">
         <Editor
-          height="calc(90vh - 70px)" /* Adjusted height to account for bottom padding */
+          height="calc(90vh - 70px)"
           defaultLanguage="json"
           value={code}
           onChange={setCode}
@@ -387,11 +390,11 @@ function App() {
             folding: true,
             automaticLayout: true,
             formatOnPaste: true,
-            scrollBeyondLastLine: true /* Changed to true to allow scrolling beyond last line */,
+            scrollBeyondLastLine: true,
             tabSize: 2,
             renderValidationDecorations: "on",
             colorDecorators: true,
-            padding: { top: 10, bottom: 20 } /* Added padding to the editor */,
+            padding: { top: 10, bottom: 20 },
           }}
         />
       </div>
@@ -447,7 +450,6 @@ function App() {
         </div>
       )}
 
-      {/* Beautiful Upload JSON Alert */}
       <div
         className={`alert-overlay ${showUploadAlert ? "show" : ""}`}
         onClick={() => setShowUploadAlert(false)}
