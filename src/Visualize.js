@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Visualize.css";
 import "./Card.css";
@@ -15,7 +15,6 @@ import {
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
-import ShareDialog from "./ShareDialog";
 
 // Register ChartJS components
 ChartJS.register(
@@ -50,129 +49,18 @@ const CloseIcon = () => (
   </svg>
 );
 
-// Add ShareIcon component definition
-const ShareIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    style={{ display: "block" }}
-  >
-    <path
-      d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.12548 15.0077 5.24917 15.0227 5.37069L8.08261 9.19621C7.54029 8.46785 6.7889 8 5.93426 8C4.3376 8 3 9.34315 3 11C3 12.6569 4.3376 14 5.93426 14C6.7889 14 7.54029 13.5321 8.08261 12.8038L15.0227 16.6293C15.0077 16.7508 15 16.8745 15 17C15 18.6569 16.3431 20 18 20C19.6569 20 21 18.6569 21 17C21 15.3431 19.6569 14 18 14C17.1453 14 16.3939 14.4678 15.8516 15.1962L8.91148 11.3707C8.9265 11.2492 8.93426 11.1255 8.93426 11C8.93426 10.8745 8.9265 10.7508 8.91148 10.6293L15.8516 6.80377C16.3939 7.53215 17.1453 8 18 8Z"
-      fill="currentColor"
-    />
-  </svg>
-);
-
-// Add ShareNotification component
-const ShareNotification = ({ show }) => {
-  if (!show) return null;
-
-  return (
-    <div className="share-notification">
-      <div className="notification-content">Link copied to clipboard!</div>
-    </div>
-  );
-};
-
 function Visualize() {
-  const [jsonData, setJsonData] = useState(null);
-  const [filteredData, setFilteredData] = useState(null); // New state for filtered data
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [jsonData] = useState(location.state?.data || null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
   const [showTestModal, setShowTestModal] = useState(false);
-  // Add new state variables for sharing functionality
-  const [showShareDialog, setShowShareDialog] = useState(false);
-  const [shareDialogPosition, setShareDialogPosition] = useState(null);
-  const [shareUrl, setShareUrl] = useState("");
-  const [showShareNotification, setShowShareNotification] = useState(false);
-  const [patientToShare, setPatientToShare] = useState(null);
-  const [isSharedView, setIsSharedView] = useState(false); // Track if viewing a shared patient
 
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    try {
-      const searchParams = new URLSearchParams(location.search);
-      const sharedPatientId = searchParams.get("patientId");
-      const encodedData = searchParams.get("data");
-
-      // First check for full encoded data
-      if (encodedData) {
-        try {
-          const decodedData = JSON.parse(atob(encodedData));
-          // Set the decoded data as the json data
-          setJsonData([decodedData]); // Wrap in array to maintain expected structure
-          setFilteredData([decodedData]);
-          setIsSharedView(true);
-          // Automatically show this patient's details
-          setSelectedItem(decodedData);
-          setShowDetailModal(true);
-          return; // Skip localStorage check if we have encoded data
-        } catch (decodeError) {
-          console.error("Error decoding shared data:", decodeError);
-          // Continue to check other parameters if decoding fails
-        }
-      }
-
-      // Use localStorage data if no encoded data or if decoding failed
-      const storedData = localStorage.getItem("validatedJSON");
-      if (storedData) {
-        const parsedData = JSON.parse(storedData);
-        setJsonData(parsedData);
-
-        // If there's a patientId in the URL, filter the data to show only that patient
-        if (sharedPatientId) {
-          const filteredPatient = parsedData.find(
-            (patient) => patient.patientId === sharedPatientId
-          );
-          if (filteredPatient) {
-            setFilteredData([filteredPatient]);
-            setIsSharedView(true);
-            // Automatically show this patient's details if it's a shared link
-            setSelectedItem(filteredPatient);
-            setShowDetailModal(true);
-          } else {
-            // If patient not found, show a message and display all data
-            alert(
-              "Shared patient data not found. Showing all available patients."
-            );
-            setFilteredData(parsedData);
-          }
-        } else {
-          // No patientId in URL, show all data
-          setFilteredData(parsedData);
-        }
-      } else if (!encodedData) {
-        // Only show this alert if we don't have encoded data and no localStorage
-        alert(
-          "No JSON data found. Please upload and validate a JSON file first."
-        );
-        navigate("/");
-      }
-    } catch (e) {
-      console.error("Error loading JSON data:", e);
-      alert("Error loading JSON data. Please try again.");
-      navigate("/");
-    }
-  }, [navigate, location]);
-
+  // Remove the redirect and alert block, the UI will handle the no-data state
   const goBack = () => {
-    // If viewing a shared patient, going back should clear the filter
-    if (isSharedView) {
-      setFilteredData(jsonData);
-      setIsSharedView(false);
-      setShowDetailModal(false);
-      // Remove the patient ID from the URL without navigating away
-      const newUrl = window.location.pathname;
-      window.history.pushState({}, "", newUrl);
-      return;
-    }
     navigate("/");
   };
 
@@ -192,89 +80,6 @@ function Visualize() {
 
   const closeTestDetails = () => {
     setShowTestModal(false);
-  };
-
-  // Add new share functionality methods
-  const handleShare = (patient, event) => {
-    event.stopPropagation(); // Prevent opening the patient details modal
-
-    // Create a position near the share button that was clicked
-    const rect = event.currentTarget.getBoundingClientRect();
-    const position = {
-      top: rect.bottom + 10,
-      left: rect.left - 300, // Position dialog to the left of the button
-    };
-
-    // Generate share URL with encoded patient data
-    const baseUrl = window.location.origin + window.location.pathname;
-
-    // Create a clean patient object for sharing, removing any excessively large data
-    // that would cause QR code issues
-    const shareablePatient = { ...patient };
-
-    // If cmgTests array has large dataPoints arrays, simplify them
-    if (shareablePatient.cmgTests && shareablePatient.cmgTests.length > 0) {
-      shareablePatient.cmgTests = shareablePatient.cmgTests.map((test) => {
-        const simplifiedTest = { ...test };
-        // Store dataPoints length but not the actual data to reduce size
-        if (
-          simplifiedTest.dataPoints &&
-          simplifiedTest.dataPoints.length > 20
-        ) {
-          simplifiedTest.dataPointsCount = simplifiedTest.dataPoints.length;
-          simplifiedTest.dataPoints = simplifiedTest.dataPoints.slice(0, 20); // Keep only first 20 points
-        }
-        return simplifiedTest;
-      });
-    }
-
-    // Encode the patient data in base64
-    const encodedData = btoa(JSON.stringify(shareablePatient));
-    const shareLink = `${baseUrl}?data=${encodedData}`;
-
-    setPatientToShare(patient);
-    setShareUrl(shareLink);
-    setShareDialogPosition(position);
-    setShowShareDialog(true);
-  };
-
-  const handleCloseShareDialog = () => {
-    setShowShareDialog(false);
-  };
-
-  const handleCopyLink = () => {
-    navigator.clipboard
-      .writeText(shareUrl)
-      .then(() => {
-        // Show notification
-        setShowShareNotification(true);
-        // Hide after 3 seconds
-        setTimeout(() => {
-          setShowShareNotification(false);
-        }, 3000);
-
-        // Close dialog
-        setShowShareDialog(false);
-      })
-      .catch((err) => {
-        console.error("Failed to copy link: ", err);
-        alert("Failed to copy link to clipboard");
-      });
-  };
-
-  const handleEmailShare = () => {
-    const subject = `Patient Data: ${patientToShare?.name || "Patient"}`;
-    const body = `View patient data at: ${shareUrl}`;
-    window.location.href = `mailto:?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(body)}`;
-    setShowShareDialog(false);
-  };
-
-  const handleWhatsAppShare = () => {
-    const text = `View patient data: ${shareUrl}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-    setShowShareDialog(false);
   };
 
   const formatDate = (dateString) => {
@@ -303,13 +108,13 @@ function Visualize() {
   };
 
   const renderPatientCards = () => {
-    if (!filteredData || !filteredData.length) {
+    if (!jsonData || !jsonData.length) {
       return <p>No patient data available</p>;
     }
 
     return (
       <div className="patient-cards">
-        {filteredData.map((patient) => {
+        {jsonData.map((patient) => {
           return (
             <div
               key={patient.patientId}
@@ -318,13 +123,6 @@ function Visualize() {
             >
               <div className="card-header-actions">
                 <h2>{patient.name}</h2>
-                <button
-                  className="share-btn"
-                  onClick={(e) => handleShare(patient, e)}
-                  title="Share patient data"
-                >
-                  <ShareIcon />
-                </button>
               </div>
               <div className="patient-info">
                 <p>
@@ -761,45 +559,31 @@ function Visualize() {
   return (
     <div className="visualize">
       <header>
-        <h1>
-          {isSharedView
-            ? `Patient Data: ${filteredData?.[0]?.name || "Patient"}`
-            : "Patient CMG Test Data"}
-        </h1>
+        <h1>Data Visualization</h1>
         <div className="header-actions">
-          {isSharedView && (
-            <div className="shared-view-indicator">
-              <span className="shared-badge">Shared View</span>
-            </div>
-          )}
           <button className="back-btn" onClick={goBack}>
-            {isSharedView ? "View All Patients" : "Back to Editor"}
+            Back to Editor
           </button>
         </div>
       </header>
 
       <main>
-        {filteredData ? renderPatientCards() : <p>Loading data...</p>}
+        {!jsonData ? (
+          <div className="no-data-message">
+            <h2>No data found</h2>
+            <p>Please validate your JSON in the editor first</p>
+          </div>
+        ) : jsonData ? (
+          renderPatientCards()
+        ) : (
+          <p>Loading data...</p>
+        )}
       </main>
 
       {showDetailModal && renderPatientDetails()}
       {showTestModal && renderTestDetails()}
-
-      {/* Add ShareDialog component */}
-      <ShareDialog
-        show={showShareDialog}
-        onClose={handleCloseShareDialog}
-        patient={patientToShare}
-        shareUrl={shareUrl}
-        position={shareDialogPosition}
-        onCopyLink={handleCopyLink}
-        onEmailShare={handleEmailShare}
-        onWhatsAppShare={handleWhatsAppShare}
-      />
-
-      {/* Add ShareNotification component */}
-      <ShareNotification show={showShareNotification} />
     </div>
   );
 }
+
 export default Visualize;

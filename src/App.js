@@ -276,10 +276,18 @@ function App() {
         try {
           const content = event.target.result;
           // Validate JSON
-          JSON.parse(content); // Just check if it's valid JSON
+          const parsedData = JSON.parse(content);
           setCode(content);
           validateJsonContent(content);
           setShowUploadAlert(false); // Close the alert on success
+
+          // Store in localStorage (maintaining backward compatibility)
+          localStorage.setItem("validatedJSON", JSON.stringify(parsedData));
+          localStorage.setItem("editorJSON", content); // Store the formatted editor content
+
+          // Also store in sessionStorage for sharing functionality
+          sessionStorage.setItem("uploadedJSON", content);
+          
         } catch (e) {
           alert("Invalid JSON file!");
         }
@@ -318,13 +326,10 @@ function App() {
       validateJsonContent(value);
 
       if (isValid) {
-        // Store the complete JSON data
         try {
           const parsedJSON = JSON.parse(value);
-          localStorage.setItem("validatedJSON", JSON.stringify(parsedJSON));
-          localStorage.setItem("editorJSON", value); // Store the formatted editor content
-
-          navigate("/visualize");
+          // Remove storage operations and directly pass data through navigation
+          navigate("/visualize", { state: { data: parsedJSON } });
         } catch (e) {
           setIsValid(false);
           alert(`JSON parsing error: ${e.message}`);
@@ -366,7 +371,6 @@ function App() {
               Upload JSON
             </button>
           </div>
-          <button className="btn">Share as Gist</button>
         </div>
       </header>
       <div className="editor-container">
