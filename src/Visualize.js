@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Visualize.css";
 import "./Card.css";
@@ -12,9 +12,13 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler,
+  SubTitle,
+  TimeScale,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
+import 'chartjs-adapter-date-fns';
 
 // Register ChartJS components
 ChartJS.register(
@@ -23,8 +27,11 @@ ChartJS.register(
   PointElement,
   LineElement,
   Title,
+  SubTitle,
   Tooltip,
   Legend,
+  Filler,
+  TimeScale,
   zoomPlugin,
   annotationPlugin
 );
@@ -52,12 +59,18 @@ const CloseIcon = () => (
 function Visualize() {
   const location = useLocation();
   const navigate = useNavigate();
+  const chartRef = useRef(null);
 
   const [jsonData] = useState(location.state?.data || null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
   const [showTestModal, setShowTestModal] = useState(false);
+  const [chartType, setChartType] = useState('smooth'); // 'smooth', 'linear', 'stepped'
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareWith, setCompareWith] = useState(null);
+  const [showStats, setShowStats] = useState(true);
+  const [statsHighlight, setStatsHighlight] = useState('none'); // 'none', 'anomalies', 'trends'
 
   // Remove the redirect and alert block, the UI will handle the no-data state
   const goBack = () => {
@@ -75,6 +88,7 @@ function Visualize() {
 
   const viewTestDetails = (test) => {
     setSelectedTest(test);
+    setCompareWith(null); // Reset comparison when viewing a new test
     setShowTestModal(true);
   };
 
@@ -105,6 +119,81 @@ function Visualize() {
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  };
+
+  // New function to calculate statistics
+  const calculateStats = (dataPoints) => {
+    if (!dataPoints || dataPoints.length === 0) return {};
+    
+    const sum = dataPoints.reduce((a, b) => a + b, 0);
+    const avg = sum / dataPoints.length;
+    const sortedPoints = [...dataPoints].sort((a, b) => a - b);
+    const median = sortedPoints[Math.floor(dataPoints.length / 2)];
+    const min = Math.min(...dataPoints);
+    const max = Math.max(...dataPoints);
+    
+    // Calculate standard deviation
+    const squareDiffs = dataPoints.map(value => {
+      const diff = value - avg;
+      return diff * diff;
+    });
+    const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / squareDiffs.length;
+    const stdDev = Math.sqrt(avgSquareDiff);
+    
+    // Calculate rates of change (trend)
+    const rateOfChange = [];
+    for (let i = 1; i < dataPoints.length; i++) {
+      rateOfChange.push(dataPoints[i] - dataPoints[i-1]);
+    }
+    
+    const avgRateOfChange = rateOfChange.reduce((a, b) => a + b, 0) / rateOfChange.length;
+    
+    // Identify anomalies (values outside 2 standard deviations)
+    const anomalies = dataPoints.map((point, index) => {
+      return Math.abs(point - avg) > 2 * stdDev ? index : -1;
+    }).filter(index => index !== -1);
+    
+    return {
+      mean: avg.toFixed(2),
+      median: median.toFixed(2),
+      min: min.toFixed(2),
+      max: max.toFixed(2),
+      stdDev: stdDev.toFixed(2),
+      avgRateOfChange: avgRateOfChange.toFixed(2),
+      anomalies
+    };
+  };
+
+  // Function to export data to CSV
+  const exportToCSV = (test) => {
+    if (!test || !test.dataPoints) return;
+    
+    // Create CSV content
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Time,Pressure\n";
+    
+    test.dataPoints.forEach((point, index) => {
+      csvContent += `${index+1},${point}\n`;
+    });
+    
+    // Add notes if available
+    if (test.notes && test.notes.length > 0) {
+      csvContent += "\nNotes:\n";
+      csvContent += "Time,Pressure,Note\n";
+      
+      test.notes.forEach(note => {
+        csvContent += `${note.timestamp},${note.pressure},"${note.note}"\n`;
+      });
+    }
+    
+    // Create download link
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `patient_test_${new Date().getTime()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const renderPatientCards = () => {
@@ -253,9 +342,19 @@ function Visualize() {
     );
   };
 
+  const createGradient = (ctx, area, colorStart, colorEnd) => {
+    const gradient = ctx.createLinearGradient(0, area.bottom, 0, area.top);
+    gradient.addColorStop(0, colorStart);
+    gradient.addColorStop(1, colorEnd);
+    return gradient;
+  };
+
   const renderTestDetails = () => {
     if (!selectedTest) return null;
 
+    // Calculate statistics
+    const stats = calculateStats(selectedTest.dataPoints);
+    
     // Prepare chart data
     const labels = Array.from(
       { length: selectedTest.dataPoints.length },
@@ -266,6 +365,24 @@ function Visualize() {
 
     // Create a pointRadius array with all zeros by default
     const pointRadiusArray = new Array(selectedTest.dataPoints.length).fill(0);
+    
+    // Mark anomalies if requested
+    if (statsHighlight === 'anomalies' && stats.anomalies) {
+      stats.anomalies.forEach(index => {
+        pointRadiusArray[index] = 5;
+        
+        // Add anomaly annotation
+        annotations[`anomaly${index}`] = {
+          type: 'point',
+          xValue: index,
+          yValue: selectedTest.dataPoints[index],
+          backgroundColor: 'rgba(255, 99, 132, 0.7)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 2,
+          radius: 6,
+        };
+      });
+    }
 
     // Add annotations from notes
     if (selectedTest.notes && selectedTest.notes.length > 0) {
@@ -321,6 +438,28 @@ function Visualize() {
       });
     }
 
+    // Add mean line annotation
+    if (showStats && stats.mean) {
+      annotations.meanLine = {
+        type: "line",
+        yMin: parseFloat(stats.mean),
+        yMax: parseFloat(stats.mean),
+        borderColor: "rgba(255, 159, 64, 0.7)",
+        borderWidth: 2,
+        borderDash: [5, 5],
+        label: {
+          display: true,
+          content: `Mean: ${stats.mean}`,
+          position: "start",
+          backgroundColor: "rgba(255, 159, 64, 0.7)",
+          font: {
+            size: 12,
+            weight: "bold",
+          },
+        },
+      };
+    }
+
     // Add other annotations similar to the example
     // Horizontal "Target" line
     annotations.targetLine = {
@@ -368,29 +507,99 @@ function Visualize() {
       };
     }
 
+    // Prepare datasets
+    const datasets = [
+      {
+        label: "Pressure",
+        data: selectedTest.dataPoints,
+        borderColor: function(context) {
+          const chart = context.chart;
+          const {ctx, chartArea} = chart;
+          
+          if (!chartArea) {
+            // This can happen when the chart is not yet rendered
+            return 'rgba(75, 192, 192, 1)';
+          }
+          // Gradient for the main line
+          return createGradient(
+            ctx, 
+            chartArea, 
+            'rgba(75, 192, 192, 0.8)', 
+            'rgba(75, 192, 192, 1)'
+          );
+        },
+        backgroundColor: function(context) {
+          const chart = context.chart;
+          const {ctx, chartArea} = chart;
+          
+          if (!chartArea) {
+            return 'rgba(75, 192, 192, 0.4)';
+          }
+          // Gradient fill
+          return createGradient(
+            ctx, 
+            chartArea, 
+            'rgba(75, 192, 192, 0.1)', 
+            'rgba(75, 192, 192, 0.5)'
+          );
+        },
+        pointRadius: pointRadiusArray,
+        pointHoverRadius: 8,
+        pointBackgroundColor: "rgba(75, 192, 192, 1)",
+        pointBorderColor: "#fff",
+        pointBorderWidth: 1,
+        tension: chartType === 'smooth' ? 0.4 : chartType === 'stepped' ? 0 : 0.1,
+        fill: true,
+        borderWidth: 2,
+        stepped: chartType === 'stepped',
+      },
+    ];
+
+    // Add comparison dataset if needed
+    if (compareMode && compareWith && compareWith.dataPoints) {
+      datasets.push({
+        label: "Comparison",
+        data: compareWith.dataPoints,
+        borderColor: "rgba(255, 99, 132, 1)",
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        pointRadius: 0,
+        pointHoverRadius: 6,
+        tension: chartType === 'smooth' ? 0.4 : chartType === 'stepped' ? 0 : 0.1,
+        fill: false,
+        borderWidth: 2,
+        borderDash: [5, 5],
+        stepped: chartType === 'stepped',
+      });
+      
+      // Add comparison date annotation
+      annotations.comparisonDate = {
+        type: "label",
+        xValue: compareWith.dataPoints.length / 2,
+        yValue: Math.max(...compareWith.dataPoints),
+        content: `Comparison: ${formatDate(compareWith.createdAt || 'N/A')}`,
+        backgroundColor: "rgba(255, 99, 132, 0.7)",
+        color: "white",
+        borderRadius: 4,
+        font: {
+          size: 12,
+          weight: "bold",
+        },
+        padding: 6,
+      };
+    }
+
     const chartData = {
       labels: labels,
-      datasets: [
-        {
-          label: "Pressure",
-          data: selectedTest.dataPoints,
-          borderColor: "rgba(75, 192, 192, 1)",
-          backgroundColor: "rgba(75, 192, 192, 0.4)",
-          pointRadius: pointRadiusArray, // Use the custom pointRadius array
-          pointHoverRadius: 8, // Larger points on hover
-          pointBackgroundColor: "rgba(75, 192, 192, 1)",
-          pointBorderColor: "#fff",
-          pointBorderWidth: 1,
-          tension: 0.3,
-          fill: true,
-          borderWidth: 2,
-        },
-      ],
+      datasets: datasets,
     };
 
     const chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
       plugins: {
         tooltip: {
           mode: "index",
@@ -404,10 +613,45 @@ function Visualize() {
               }
               return `Time ${index}`;
             },
+            // Add rate of change
+            afterLabel: function(context) {
+              const index = context.dataIndex;
+              const dataset = context.dataset.data;
+              
+              if (index > 0) {
+                const change = dataset[index] - dataset[index-1];
+                const percentChange = ((change / dataset[index-1]) * 100).toFixed(1);
+                return `Change: ${change.toFixed(2)} (${percentChange}%)`;
+              }
+              return '';
+            }
           },
+          // Make the tooltip more visually appealing
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'white',
+          bodyColor: 'white',
+          borderColor: 'rgba(75, 192, 192, 0.8)',
+          borderWidth: 1,
+          padding: 10,
+          bodyFont: {
+            size: 13
+          },
+          titleFont: {
+            size: 14,
+            weight: 'bold'
+          },
+          boxPadding: 5,
+          usePointStyle: true,
         },
         legend: {
           position: "top",
+          labels: {
+            usePointStyle: true,
+            padding: 15,
+            font: {
+              size: 13
+            }
+          }
         },
         zoom: {
           zoom: {
@@ -417,13 +661,14 @@ function Visualize() {
             pinch: {
               enabled: true,
             },
-            mode: "x",
-            scaleMode: "x",
+            mode: "xy",
+            scaleMode: "xy",
+            overScaleMode: 'y',
           },
           pan: {
             enabled: true,
-            mode: "x",
-            scaleMode: "x",
+            mode: "xy",
+            scaleMode: "xy",
           },
           limits: {
             x: { min: "original", max: "original" },
@@ -432,10 +677,40 @@ function Visualize() {
         },
         title: {
           display: true,
-          text: "Test Data Points",
+          text: "Pressure Monitoring",
+          font: {
+            size: 18,
+            weight: 'bold'
+          },
+          padding: {
+            top: 10,
+            bottom: 10
+          }
+        },
+        subtitle: {
+          display: true,
+          text: `Test Date: ${formatDate(selectedTest.createdAt)}`,
+          padding: {
+            bottom: 20
+          }
         },
         annotation: {
           annotations: annotations,
+        },
+        // Crosshair on hover
+        crosshair: {
+          line: {
+            color: 'rgba(0, 0, 0, 0.3)',
+            width: 1,
+            dashPattern: [5, 5]
+          },
+          sync: {
+            enabled: true,
+            group: 1,
+          },
+          zoom: {
+            enabled: true,
+          },
         },
       },
       scales: {
@@ -443,21 +718,49 @@ function Visualize() {
           title: {
             display: true,
             text: "Time",
+            font: {
+              size: 14,
+              weight: 'bold'
+            },
+            padding: {top: 10, bottom: 0}
           },
           grid: {
             display: true,
             color: "rgba(0, 0, 0, 0.05)",
+            drawBorder: true,
+            borderDash: [5, 5],
           },
+          ticks: {
+            callback: function(value) {
+              // More readable x-axis labels
+              if (value % 5 === 0 || value === 1) {
+                return value;
+              }
+              return '';
+            },
+            maxRotation: 0,
+            padding: 5
+          }
         },
         y: {
           title: {
             display: true,
             text: "Pressure",
+            font: {
+              size: 14,
+              weight: 'bold'
+            },
+            padding: {top: 0, bottom: 10}
           },
           beginAtZero: true,
           grid: {
             color: "rgba(0, 0, 0, 0.05)",
+            drawBorder: true,
+            borderDash: [5, 5],
           },
+          ticks: {
+            padding: 5
+          }
         },
       },
       elements: {
@@ -465,8 +768,36 @@ function Visualize() {
           radius: 0, // Default radius is 0 (no points shown)
           hitRadius: 10, // Area around point that will register hover events
         },
+        line: {
+          cubicInterpolationMode: 'monotone', // More natural curves
+        }
       },
+      animation: {
+        duration: 1000, // Smooth animation for better visual appeal
+        easing: 'easeOutQuart'
+      },
+      transitions: {
+        zoom: {
+          animation: {
+            duration: 500
+          }
+        }
+      }
     };
+
+    // Prepare comparison options
+    const comparisonOptions = [];
+    if (selectedItem && selectedItem.cmgTests) {
+      selectedItem.cmgTests.forEach((test, index) => {
+        if (test !== selectedTest) {
+          comparisonOptions.push({
+            id: index,
+            date: formatDate(test.createdAt),
+            test: test
+          });
+        }
+      });
+    }
 
     return (
       <div className="modal-overlay" onClick={closeTestDetails}>
@@ -506,23 +837,126 @@ function Visualize() {
             </p>
           </div>
 
-          <div className="chart-container">
-            <Line data={chartData} options={chartOptions} height={400} />
-            <div className="chart-controls">
-              <button
-                onClick={() => {
-                  const chart = document.querySelector(
-                    ".chart-container canvas"
-                  );
-                  if (chart) {
-                    const chartInstance = ChartJS.getChart(chart);
-                    chartInstance.resetZoom();
+          {/* Chart controls */}
+          <div className="chart-controls">
+            <div className="control-group">
+              <label>Line Type:</label>
+              <select 
+                value={chartType} 
+                onChange={(e) => setChartType(e.target.value)}
+                className="chart-select"
+              >
+                <option value="smooth">Smooth</option>
+                <option value="linear">Linear</option>
+                <option value="stepped">Stepped</option>
+              </select>
+            </div>
+            
+            <div className="control-group">
+              <label>Analysis:</label>
+              <select 
+                value={statsHighlight} 
+                onChange={(e) => setStatsHighlight(e.target.value)}
+                className="chart-select"
+              >
+                <option value="none">None</option>
+                <option value="anomalies">Highlight Anomalies</option>
+                <option value="trends">Show Trends</option>
+              </select>
+            </div>
+            
+            <div className="control-group">
+              <label>Compare:</label>
+              <select 
+                className="chart-select"
+                onChange={(e) => {
+                  if (e.target.value === "none") {
+                    setCompareMode(false);
+                    setCompareWith(null);
+                  } else {
+                    const selectedOption = comparisonOptions.find(
+                      option => option.id.toString() === e.target.value
+                    );
+                    if (selectedOption) {
+                      setCompareMode(true);
+                      setCompareWith(selectedOption.test);
+                    }
                   }
                 }}
               >
-                Reset Zoom
-              </button>
+                <option value="none">No Comparison</option>
+                {comparisonOptions.map(option => (
+                  <option key={option.id} value={option.id}>
+                    {option.date}
+                  </option>
+                ))}
+              </select>
             </div>
+
+            <button
+              className="chart-button"
+              onClick={() => exportToCSV(selectedTest)}
+            >
+              Export Data
+            </button>
+            
+            <button
+              className="chart-button"
+              onClick={() => {
+                const chart = chartRef.current;
+                if (chart) {
+                  chart.resetZoom();
+                }
+              }}
+            >
+              Reset View
+            </button>
+          </div>
+
+          {/* Statistics Panel */}
+          {showStats && (
+            <div className="stats-panel">
+              <h3>Statistical Analysis</h3>
+              <div className="stats-grid">
+                <div className="stat-item">
+                  <span className="stat-label">Mean:</span>
+                  <span className="stat-value">{stats.mean}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Median:</span>
+                  <span className="stat-value">{stats.median}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Min:</span>
+                  <span className="stat-value">{stats.min}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Max:</span>
+                  <span className="stat-value">{stats.max}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Std Dev:</span>
+                  <span className="stat-value">{stats.stdDev}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Trend:</span>
+                  <span className="stat-value">{stats.avgRateOfChange}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Anomalies:</span>
+                  <span className="stat-value">{stats.anomalies ? stats.anomalies.length : 0}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="chart-container">
+            <Line 
+              data={chartData} 
+              options={chartOptions} 
+              height={400} 
+              ref={chartRef}
+            />
           </div>
 
           <div className="notes-section">
@@ -555,6 +989,14 @@ function Visualize() {
       </div>
     );
   };
+
+  // Initialize chart.js with refs
+  useEffect(() => {
+    if (chartRef.current) {
+      const chart = chartRef.current;
+      // Any initialization needed for the chart can go here
+    }
+  }, [selectedTest]);
 
   return (
     <div className="visualize">
