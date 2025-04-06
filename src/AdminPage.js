@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { visualizeAllGists, validateGithubToken } from "./utils/githubConfig";
+import { visualizeAllGists } from "./utils/githubConfig";
 
 function AdminPage() {
   const [password, setPassword] = useState("");
@@ -18,11 +18,6 @@ function AdminPage() {
     const correctPassword = process.env.REACT_APP_ADMIN_PASSWORD;
 
     if (password === correctPassword) {
-      if (!validateGithubToken()) {
-        setError("GitHub token is not configured. Please check your environment variables.");
-        return;
-      }
-
       setIsLoading(true);
       try {
         const data = await visualizeAllGists();
