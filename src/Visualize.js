@@ -18,7 +18,8 @@ import {
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
-import 'chartjs-adapter-date-fns';
+import "chartjs-adapter-date-fns";
+import { secondsToHumanReadable } from "./utils/timeUtils";
 
 // Register ChartJS components
 ChartJS.register(
@@ -66,11 +67,11 @@ function Visualize() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
   const [showTestModal, setShowTestModal] = useState(false);
-  const [chartType, setChartType] = useState('smooth'); // 'smooth', 'linear', 'stepped'
+  const [chartType, setChartType] = useState("smooth"); // 'smooth', 'linear', 'stepped'
   const [compareMode, setCompareMode] = useState(false);
   const [compareWith, setCompareWith] = useState(null);
   const [showStats, setShowStats] = useState(true);
-  const [statsHighlight, setStatsHighlight] = useState('none'); // 'none', 'anomalies', 'trends'
+  const [statsHighlight, setStatsHighlight] = useState("none"); // 'none', 'anomalies', 'trends'
 
   // Remove the redirect and alert block, the UI will handle the no-data state
   const goBack = () => {
@@ -124,35 +125,39 @@ function Visualize() {
   // New function to calculate statistics
   const calculateStats = (dataPoints) => {
     if (!dataPoints || dataPoints.length === 0) return {};
-    
+
     const sum = dataPoints.reduce((a, b) => a + b, 0);
     const avg = sum / dataPoints.length;
     const sortedPoints = [...dataPoints].sort((a, b) => a - b);
     const median = sortedPoints[Math.floor(dataPoints.length / 2)];
     const min = Math.min(...dataPoints);
     const max = Math.max(...dataPoints);
-    
+
     // Calculate standard deviation
-    const squareDiffs = dataPoints.map(value => {
+    const squareDiffs = dataPoints.map((value) => {
       const diff = value - avg;
       return diff * diff;
     });
-    const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / squareDiffs.length;
+    const avgSquareDiff =
+      squareDiffs.reduce((a, b) => a + b, 0) / squareDiffs.length;
     const stdDev = Math.sqrt(avgSquareDiff);
-    
+
     // Calculate rates of change (trend)
     const rateOfChange = [];
     for (let i = 1; i < dataPoints.length; i++) {
-      rateOfChange.push(dataPoints[i] - dataPoints[i-1]);
+      rateOfChange.push(dataPoints[i] - dataPoints[i - 1]);
     }
-    
-    const avgRateOfChange = rateOfChange.reduce((a, b) => a + b, 0) / rateOfChange.length;
-    
+
+    const avgRateOfChange =
+      rateOfChange.reduce((a, b) => a + b, 0) / rateOfChange.length;
+
     // Identify anomalies (values outside 2 standard deviations)
-    const anomalies = dataPoints.map((point, index) => {
-      return Math.abs(point - avg) > 2 * stdDev ? index : -1;
-    }).filter(index => index !== -1);
-    
+    const anomalies = dataPoints
+      .map((point, index) => {
+        return Math.abs(point - avg) > 2 * stdDev ? index : -1;
+      })
+      .filter((index) => index !== -1);
+
     return {
       mean: avg.toFixed(2),
       median: median.toFixed(2),
@@ -160,40 +165,8 @@ function Visualize() {
       max: max.toFixed(2),
       stdDev: stdDev.toFixed(2),
       avgRateOfChange: avgRateOfChange.toFixed(2),
-      anomalies
+      anomalies,
     };
-  };
-
-  // Function to export data to CSV
-  const exportToCSV = (test) => {
-    if (!test || !test.dataPoints) return;
-    
-    // Create CSV content
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Time,Pressure\n";
-    
-    test.dataPoints.forEach((point, index) => {
-      csvContent += `${index+1},${point}\n`;
-    });
-    
-    // Add notes if available
-    if (test.notes && test.notes.length > 0) {
-      csvContent += "\nNotes:\n";
-      csvContent += "Time,Pressure,Note\n";
-      
-      test.notes.forEach(note => {
-        csvContent += `${note.timestamp},${note.pressure},"${note.note}"\n`;
-      });
-    }
-    
-    // Create download link
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `patient_test_${new Date().getTime()}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   const renderPatientCards = () => {
@@ -354,7 +327,7 @@ function Visualize() {
 
     // Calculate statistics
     const stats = calculateStats(selectedTest.dataPoints);
-    
+
     // Prepare chart data
     const labels = Array.from(
       { length: selectedTest.dataPoints.length },
@@ -365,19 +338,19 @@ function Visualize() {
 
     // Create a pointRadius array with all zeros by default
     const pointRadiusArray = new Array(selectedTest.dataPoints.length).fill(0);
-    
+
     // Mark anomalies if requested
-    if (statsHighlight === 'anomalies' && stats.anomalies) {
-      stats.anomalies.forEach(index => {
+    if (statsHighlight === "anomalies" && stats.anomalies) {
+      stats.anomalies.forEach((index) => {
         pointRadiusArray[index] = 5;
-        
+
         // Add anomaly annotation
         annotations[`anomaly${index}`] = {
-          type: 'point',
+          type: "point",
           xValue: index,
           yValue: selectedTest.dataPoints[index],
-          backgroundColor: 'rgba(255, 99, 132, 0.7)',
-          borderColor: 'rgba(255, 99, 132, 1)',
+          backgroundColor: "rgba(255, 99, 132, 0.7)",
+          borderColor: "rgba(255, 99, 132, 1)",
           borderWidth: 2,
           radius: 6,
         };
@@ -512,35 +485,35 @@ function Visualize() {
       {
         label: "Pressure",
         data: selectedTest.dataPoints,
-        borderColor: function(context) {
+        borderColor: function (context) {
           const chart = context.chart;
-          const {ctx, chartArea} = chart;
-          
+          const { ctx, chartArea } = chart;
+
           if (!chartArea) {
             // This can happen when the chart is not yet rendered
-            return 'rgba(75, 192, 192, 1)';
+            return "rgba(75, 192, 192, 1)";
           }
           // Gradient for the main line
           return createGradient(
-            ctx, 
-            chartArea, 
-            'rgba(75, 192, 192, 0.8)', 
-            'rgba(75, 192, 192, 1)'
+            ctx,
+            chartArea,
+            "rgba(75, 192, 192, 0.8)",
+            "rgba(75, 192, 192, 1)"
           );
         },
-        backgroundColor: function(context) {
+        backgroundColor: function (context) {
           const chart = context.chart;
-          const {ctx, chartArea} = chart;
-          
+          const { ctx, chartArea } = chart;
+
           if (!chartArea) {
-            return 'rgba(75, 192, 192, 0.4)';
+            return "rgba(75, 192, 192, 0.4)";
           }
           // Gradient fill
           return createGradient(
-            ctx, 
-            chartArea, 
-            'rgba(75, 192, 192, 0.1)', 
-            'rgba(75, 192, 192, 0.5)'
+            ctx,
+            chartArea,
+            "rgba(75, 192, 192, 0.1)",
+            "rgba(75, 192, 192, 0.5)"
           );
         },
         pointRadius: pointRadiusArray,
@@ -548,10 +521,11 @@ function Visualize() {
         pointBackgroundColor: "rgba(75, 192, 192, 1)",
         pointBorderColor: "#fff",
         pointBorderWidth: 1,
-        tension: chartType === 'smooth' ? 0.4 : chartType === 'stepped' ? 0 : 0.1,
+        tension:
+          chartType === "smooth" ? 0.4 : chartType === "stepped" ? 0 : 0.1,
         fill: true,
         borderWidth: 2,
-        stepped: chartType === 'stepped',
+        stepped: chartType === "stepped",
       },
     ];
 
@@ -564,19 +538,20 @@ function Visualize() {
         backgroundColor: "rgba(255, 99, 132, 0.2)",
         pointRadius: 0,
         pointHoverRadius: 6,
-        tension: chartType === 'smooth' ? 0.4 : chartType === 'stepped' ? 0 : 0.1,
+        tension:
+          chartType === "smooth" ? 0.4 : chartType === "stepped" ? 0 : 0.1,
         fill: false,
         borderWidth: 2,
         borderDash: [5, 5],
-        stepped: chartType === 'stepped',
+        stepped: chartType === "stepped",
       });
-      
+
       // Add comparison date annotation
       annotations.comparisonDate = {
         type: "label",
         xValue: compareWith.dataPoints.length / 2,
         yValue: Math.max(...compareWith.dataPoints),
-        content: `Comparison: ${formatDate(compareWith.createdAt || 'N/A')}`,
+        content: `Comparison: ${formatDate(compareWith.createdAt || "N/A")}`,
         backgroundColor: "rgba(255, 99, 132, 0.7)",
         color: "white",
         borderRadius: 4,
@@ -597,7 +572,7 @@ function Visualize() {
       responsive: true,
       maintainAspectRatio: false,
       interaction: {
-        mode: 'index',
+        mode: "index",
         intersect: false,
       },
       plugins: {
@@ -609,36 +584,39 @@ function Visualize() {
             title: function (context) {
               const index = context[0].dataIndex;
               if (pointRadiusArray[index] > 0) {
-                return `Time ${index} - Note Available`;
+                return `Time ${secondsToHumanReadable(index)} - Note Available`;
               }
-              return `Time ${index}`;
+              return `Time ${secondsToHumanReadable(index)}`;
             },
             // Add rate of change
-            afterLabel: function(context) {
+            afterLabel: function (context) {
               const index = context.dataIndex;
               const dataset = context.dataset.data;
-              
+
               if (index > 0) {
-                const change = dataset[index] - dataset[index-1];
-                const percentChange = ((change / dataset[index-1]) * 100).toFixed(1);
+                const change = dataset[index] - dataset[index - 1];
+                const percentChange = (
+                  (change / dataset[index - 1]) *
+                  100
+                ).toFixed(1);
                 return `Change: ${change.toFixed(2)} (${percentChange}%)`;
               }
-              return '';
-            }
+              return "";
+            },
           },
           // Make the tooltip more visually appealing
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          titleColor: 'white',
-          bodyColor: 'white',
-          borderColor: 'rgba(75, 192, 192, 0.8)',
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          titleColor: "white",
+          bodyColor: "white",
+          borderColor: "rgba(75, 192, 192, 0.8)",
           borderWidth: 1,
           padding: 10,
           bodyFont: {
-            size: 13
+            size: 13,
           },
           titleFont: {
             size: 14,
-            weight: 'bold'
+            weight: "bold",
           },
           boxPadding: 5,
           usePointStyle: true,
@@ -649,9 +627,9 @@ function Visualize() {
             usePointStyle: true,
             padding: 15,
             font: {
-              size: 13
-            }
-          }
+              size: 13,
+            },
+          },
         },
         zoom: {
           zoom: {
@@ -663,7 +641,7 @@ function Visualize() {
             },
             mode: "xy",
             scaleMode: "xy",
-            overScaleMode: 'y',
+            overScaleMode: "y",
           },
           pan: {
             enabled: true,
@@ -680,19 +658,19 @@ function Visualize() {
           text: "Pressure Monitoring",
           font: {
             size: 18,
-            weight: 'bold'
+            weight: "bold",
           },
           padding: {
             top: 10,
-            bottom: 10
-          }
+            bottom: 10,
+          },
         },
         subtitle: {
           display: true,
           text: `Test Date: ${formatDate(selectedTest.createdAt)}`,
           padding: {
-            bottom: 20
-          }
+            bottom: 20,
+          },
         },
         annotation: {
           annotations: annotations,
@@ -700,9 +678,9 @@ function Visualize() {
         // Crosshair on hover
         crosshair: {
           line: {
-            color: 'rgba(0, 0, 0, 0.3)',
+            color: "rgba(0, 0, 0, 0.3)",
             width: 1,
-            dashPattern: [5, 5]
+            dashPattern: [5, 5],
           },
           sync: {
             enabled: true,
@@ -720,9 +698,9 @@ function Visualize() {
             text: "Time",
             font: {
               size: 14,
-              weight: 'bold'
+              weight: "bold",
             },
-            padding: {top: 10, bottom: 0}
+            padding: { top: 10, bottom: 0 },
           },
           grid: {
             display: true,
@@ -731,16 +709,16 @@ function Visualize() {
             borderDash: [5, 5],
           },
           ticks: {
-            callback: function(value) {
+            callback: function (value) {
               // More readable x-axis labels
-              if (value % 5 === 0 || value === 1) {
-                return value;
+              if (value % 2 === 0 || value === 1) {
+                return secondsToHumanReadable(value);
               }
-              return '';
+              return "";
             },
             maxRotation: 0,
-            padding: 5
-          }
+            padding: 5,
+          },
         },
         y: {
           title: {
@@ -748,9 +726,9 @@ function Visualize() {
             text: "Pressure",
             font: {
               size: 14,
-              weight: 'bold'
+              weight: "bold",
             },
-            padding: {top: 0, bottom: 10}
+            padding: { top: 0, bottom: 10 },
           },
           beginAtZero: true,
           grid: {
@@ -759,8 +737,8 @@ function Visualize() {
             borderDash: [5, 5],
           },
           ticks: {
-            padding: 5
-          }
+            padding: 5,
+          },
         },
       },
       elements: {
@@ -769,20 +747,20 @@ function Visualize() {
           hitRadius: 10, // Area around point that will register hover events
         },
         line: {
-          cubicInterpolationMode: 'monotone', // More natural curves
-        }
+          cubicInterpolationMode: "monotone", // More natural curves
+        },
       },
       animation: {
         duration: 1000, // Smooth animation for better visual appeal
-        easing: 'easeOutQuart'
+        easing: "easeOutQuart",
       },
       transitions: {
         zoom: {
           animation: {
-            duration: 500
-          }
-        }
-      }
+            duration: 500,
+          },
+        },
+      },
     };
 
     // Prepare comparison options
@@ -793,7 +771,7 @@ function Visualize() {
           comparisonOptions.push({
             id: index,
             date: formatDate(test.createdAt),
-            test: test
+            test: test,
           });
         }
       });
@@ -841,8 +819,8 @@ function Visualize() {
           <div className="chart-controls">
             <div className="control-group">
               <label>Line Type:</label>
-              <select 
-                value={chartType} 
+              <select
+                value={chartType}
                 onChange={(e) => setChartType(e.target.value)}
                 className="chart-select"
               >
@@ -851,11 +829,11 @@ function Visualize() {
                 <option value="stepped">Stepped</option>
               </select>
             </div>
-            
+
             <div className="control-group">
               <label>Analysis:</label>
-              <select 
-                value={statsHighlight} 
+              <select
+                value={statsHighlight}
                 onChange={(e) => setStatsHighlight(e.target.value)}
                 className="chart-select"
               >
@@ -864,10 +842,10 @@ function Visualize() {
                 <option value="trends">Show Trends</option>
               </select>
             </div>
-            
+
             <div className="control-group">
               <label>Compare:</label>
-              <select 
+              <select
                 className="chart-select"
                 onChange={(e) => {
                   if (e.target.value === "none") {
@@ -875,7 +853,7 @@ function Visualize() {
                     setCompareWith(null);
                   } else {
                     const selectedOption = comparisonOptions.find(
-                      option => option.id.toString() === e.target.value
+                      (option) => option.id.toString() === e.target.value
                     );
                     if (selectedOption) {
                       setCompareMode(true);
@@ -885,7 +863,7 @@ function Visualize() {
                 }}
               >
                 <option value="none">No Comparison</option>
-                {comparisonOptions.map(option => (
+                {comparisonOptions.map((option) => (
                   <option key={option.id} value={option.id}>
                     {option.date}
                   </option>
@@ -893,13 +871,6 @@ function Visualize() {
               </select>
             </div>
 
-            <button
-              className="chart-button"
-              onClick={() => exportToCSV(selectedTest)}
-            >
-              Export Data
-            </button>
-            
             <button
               className="chart-button"
               onClick={() => {
@@ -944,17 +915,19 @@ function Visualize() {
                 </div>
                 <div className="stat-item">
                   <span className="stat-label">Anomalies:</span>
-                  <span className="stat-value">{stats.anomalies ? stats.anomalies.length : 0}</span>
+                  <span className="stat-value">
+                    {stats.anomalies ? stats.anomalies.length : 0}
+                  </span>
                 </div>
               </div>
             </div>
           )}
 
           <div className="chart-container">
-            <Line 
-              data={chartData} 
-              options={chartOptions} 
-              height={400} 
+            <Line
+              data={chartData}
+              options={chartOptions}
+              height={400}
               ref={chartRef}
             />
           </div>
@@ -970,7 +943,8 @@ function Visualize() {
                     style={{ borderLeft: `4px solid ${hexToRgba(note.color)}` }}
                   >
                     <p>
-                      <strong>Time:</strong> {note.timestamp}
+                      <strong>Time:</strong>{" "}
+                      {secondsToHumanReadable(note.timestamp)}
                     </p>
                     <p>
                       <strong>Note:</strong> {note.note}
