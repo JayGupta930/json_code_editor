@@ -6,9 +6,7 @@ A powerful, modern web-based JSON editor built using React. With intuitive featu
 [![Live Demo](https://img.shields.io/badge/🌐-Live%20Demo-1e90ff?style=for-the-badge&labelColor=black)](https://json-code-editor.web.app/)
 [![version](https://img.shields.io/github/package-json/v/JayGupta930/json_code_editor?style=for-the-badge)](https://github.com/JayGupta930/json_code_editor)
 [![Commit Activity](https://img.shields.io/github/commit-activity/t/JayGupta930/json_code_editor?style=for-the-badge&color=black)](https://github.com/JayGupta930/json_code_editor/commits)
-
-
-
+[![Vibe Coded](https://img.shields.io/badge/Vibe%20Coded-✨-a855f7?style=for-the-badge&labelColor=4b006e)](https://github.com/Prince2347X/network_settings_listener)
 
 ---
 
