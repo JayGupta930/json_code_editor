@@ -2,7 +2,13 @@
 
 A powerful, modern web-based JSON editor built using React. With intuitive features and real-time feedback, the JSON Code Editor allows users to seamlessly write, upload, validate, format, visualize, and share JSON data — all in one place.
 
-🌐 **Live Demo**: [json-code-editor.web.app](https://json-code-editor.web.app/)
+
+[![Live Demo](https://img.shields.io/badge/🌐-Live%20Demo-1e90ff?style=for-the-badge&labelColor=black)](https://json-code-editor.web.app/)
+[![version](https://img.shields.io/github/package-json/v/JayGupta930/json_code_editor?style=for-the-badge)](https://github.com/JayGupta930/json_code_editor)
+[![Commit Activity](https://img.shields.io/github/commit-activity/t/JayGupta930/json_code_editor?style=for-the-badge&color=black)](https://github.com/JayGupta930/json_code_editor/commits)
+
+
+
 
 ---
 
