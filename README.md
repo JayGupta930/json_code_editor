@@ -24,6 +24,12 @@ A powerful, modern web-based JSON editor built using React. With intuitive featu
 
 ---
 
+## 🙋‍♂️ Author
+
+**Jay Gupta**  
+🔗 GitHub: [JayGupta930](https://github.com/JayGupta930)
+
+
 ## 🚀 Getting Started (Local Setup)
 
 Follow these steps to run the project locally:
