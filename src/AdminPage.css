@@ -1,0 +1,100 @@
+.admin-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
+}
+
+.admin-heading {
+  color: #333;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.admin-subheading {
+  color: #444;
+  margin-bottom: 1rem;
+}
+
+.login-container {
+  background-color: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-instructions {
+  margin: 0 0 1rem 0;
+  color: #555;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-label {
+  font-weight: bold;
+  color: #444;
+}
+
+.admin-input {
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  font-size: 16px;
+}
+
+.admin-error {
+  color: #dc3545;
+  margin: 0.5rem 0;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.admin-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #0275d8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.admin-button.secondary {
+  background-color: #6c757d;
+}
+
+.admin-content {
+  background-color: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-section {
+  margin: 2rem 0;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.feature-list {
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+  line-height: 1.6;
+}

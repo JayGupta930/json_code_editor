@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { visualizeAllGists } from "./utils/githubConfig";
+import "./AdminPage.css";
 
 function AdminPage() {
   const [password, setPassword] = useState("");
@@ -21,11 +22,15 @@ function AdminPage() {
       setIsLoading(true);
       try {
         const data = await visualizeAllGists();
-        navigate("/visualize", { state: { data } });
+        navigate("/visualize", { 
+          state: { 
+            data,
+            fromAdmin: true // Add this flag to indicate admin access
+          } 
+        });
       } catch (err) {
         setError("Something went wrong. Please try again later.");
         console.error("Error fetching gists:", err);
-        // navigate("/visualize", { state: { data: [] } });
       } finally {
         setIsLoading(false);
       }
@@ -48,17 +53,17 @@ function AdminPage() {
   }
 
   return (
-    <div className="admin-container" style={styles.container}>
-      <h1 style={styles.heading}>Admin Panel</h1>
+    <div className="admin-container">
+      <h1 className="admin-heading">Admin Panel</h1>
 
-      <div style={styles.loginContainer}>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <p style={styles.instructions}>
+      <div className="login-container">
+        <form onSubmit={handleSubmit} className="admin-form">
+          <p className="admin-instructions">
             Please enter the admin password to continue:
           </p>
 
-          <div style={styles.inputGroup}>
-            <label htmlFor="password" style={styles.label}>
+          <div className="input-group">
+            <label htmlFor="password" className="admin-label">
               Password:
             </label>
             <input
@@ -66,21 +71,21 @@ function AdminPage() {
               id="password"
               value={password}
               onChange={handlePasswordChange}
-              style={styles.input}
+              className="admin-input"
               autoFocus
             />
           </div>
 
-          {error && <p style={styles.error}>{error}</p>}
+          {error && <p className="admin-error">{error}</p>}
 
-          <div style={styles.buttonGroup}>
-            <button type="submit" style={styles.button}>
+          <div className="button-group">
+            <button type="submit" className="admin-button">
               Login
             </button>
             <button
               type="button"
               onClick={handleBackToHome}
-              style={{ ...styles.button, backgroundColor: "#6c757d" }}
+              className="admin-button secondary"
             >
               Back to Home
             </button>
@@ -90,91 +95,5 @@ function AdminPage() {
     </div>
   );
 }
-
-// Inline styles
-const styles = {
-  container: {
-    maxWidth: "800px",
-    margin: "0 auto",
-    padding: "2rem",
-    fontFamily: "Arial, sans-serif",
-  },
-  heading: {
-    color: "#333",
-    marginBottom: "1.5rem",
-    textAlign: "center",
-  },
-  subheading: {
-    color: "#444",
-    marginBottom: "1rem",
-  },
-  loginContainer: {
-    backgroundColor: "#f8f9fa",
-    padding: "2rem",
-    borderRadius: "8px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-  },
-  instructions: {
-    margin: "0 0 1rem 0",
-    color: "#555",
-  },
-  inputGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.5rem",
-  },
-  label: {
-    fontWeight: "bold",
-    color: "#444",
-  },
-  input: {
-    padding: "0.75rem",
-    borderRadius: "4px",
-    border: "1px solid #ced4da",
-    fontSize: "16px",
-  },
-  error: {
-    color: "#dc3545",
-    margin: "0.5rem 0",
-  },
-  buttonGroup: {
-    display: "flex",
-    gap: "1rem",
-    marginTop: "1rem",
-  },
-  button: {
-    padding: "0.75rem 1.5rem",
-    backgroundColor: "#0275d8",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-    fontSize: "16px",
-    transition: "background-color 0.2s",
-  },
-  adminContent: {
-    backgroundColor: "#f8f9fa",
-    padding: "2rem",
-    borderRadius: "8px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-  },
-  adminSection: {
-    margin: "2rem 0",
-    padding: "1rem",
-    backgroundColor: "white",
-    borderRadius: "4px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-  },
-  featureList: {
-    paddingLeft: "1.5rem",
-    margin: "1rem 0",
-    lineHeight: "1.6",
-  },
-};
 
 export default AdminPage;
