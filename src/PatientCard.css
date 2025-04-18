@@ -1,0 +1,206 @@
+.patient-cards {
+  margin: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 40px;
+}
+
+.patient-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-color: #d0d7de;
+  position: relative;
+  overflow: hidden;
+}
+
+.patient-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  border: 2px solid black;
+}
+
+.patient-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(66, 133, 244, 0.05), rgba(66, 133, 244, 0.15));
+  transform: skewX(-15deg) translateX(70%);
+  transition: transform 0.5s ease;
+}
+
+.patient-card:hover::after {
+  transform: skewX(-15deg) translateX(60%);
+}
+
+.patient-card h2 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.card-header-actions {
+  width: 100%;
+  border-bottom: 2px solid #ecf0f1;
+  margin-bottom: 16px;
+}
+
+.card-header-actions h2 {
+  margin: 0;
+  padding: 0;
+  border: none;
+  margin-bottom: 0;
+}
+
+.card-header-actions::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background-color: #4285f4;
+  transition: width 0.3s ease;
+}
+
+.patient-card:hover .card-header-actions::after {
+  width: 80px;
+}
+
+.patient-info {
+  margin-bottom: 20px;
+}
+
+.patient-info p {
+  margin: 10px 0;
+  font-size: 0.95rem;
+  color: #57606f;
+  display: flex;
+  justify-content: space-between;
+}
+
+.patient-info p strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.view-details-btn {
+  padding: 10px 16px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(66, 133, 244, 0.2);
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.view-details-btn:hover {
+  background-color: #3367d6;
+  box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
+  transform: translateY(-2px);
+}
+
+.view-details-btn:active {
+  background-color: #2850a7;
+  box-shadow: 0 1px 3px rgba(66, 133, 244, 0.3);
+  transform: translateY(1px);
+  transition: all 0.1s ease;
+}
+
+.view-details-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.4);
+}
+
+.share-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  color: #666;
+}
+
+.share-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+.share-container {
+  position: relative;
+}
+
+.share-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  padding: 8px 0;
+  min-width: 150px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.share-menu.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.share-menu-item {
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #333;
+  font-size: 14px;
+}
+
+.share-menu-item:hover {
+  background-color: rgba(66, 133, 244, 0.1);
+}
+
+.share-success {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4caf50;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.share-success.visible {
+  opacity: 1;
+  visibility: visible;
+}
