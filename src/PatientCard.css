@@ -143,6 +143,22 @@
   color: #333;
 }
 
+/* Add styling for code button beside share */
+.code-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  color: #666;
+  margin-left: 4px;
+}
+.code-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
 .share-container {
   position: relative;
 }
@@ -260,6 +276,96 @@
 
 .modal-close-btn:hover {
   background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Dialog header styling to match App.js header */
+.patient-dialog-header {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.patient-dialog-header .dialog-info {
+  color: white;
+}
+
+.patient-dialog-header .dialog-actions .btn {
+  margin-left: 8px;
+}
+
+/* Override share-button color in dialog header */
+.patient-dialog-header .share-button {
+  color: white;
+}
+.patient-dialog-header .share-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dialog Styling */
+.patient-dialog {
+  background: #ffffff;
+}
+
+.patient-dialog-header {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.patient-dialog-header .title-container h1 {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.patient-dialog-header .version {
+  font-size: 0.875rem;
+  color: #666666;
+  font-weight: normal;
+}
+
+.patient-dialog-content {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.patient-dialog-content:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e0e0e0;
+}
+
+.patient-dialog .btn {
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  font-size: 13px;
+}
+
+.patient-dialog .btn:hover {
+  background-color: #1a73e8;
 }
 
 /* Patient Details Styles */
@@ -430,4 +536,39 @@
 
 .note-item p {
   margin: 4px 0;
+}
+
+/* Copy Button Styles */
+.copy-btn {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.copy-btn.copied {
+  background-color: #4caf50;
+  transform: scale(1.05);
+}
+
+.copy-btn.copied:hover {
+  background-color: #43a047;
+}
+
+.copy-btn:disabled {
+  cursor: default;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.copy-btn.copied svg {
+  animation: checkmark 0.4s ease-in-out;
 }
